@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎬 Top-N Movie Recommendations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px #ffcc00;
+    }
+
+    .movie-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .movie-card {
+      background: #1f1f1f;
+      border-radius: 20px;
+      width: 200px;
+      height: 460px;
+      padding: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 20px rgba(255, 204, 0, 0.7);
+    }
+
+    .poster {
+      border-radius: 12px;
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .title {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ffe082;
+      text-shadow: 0 0 6px #ffd740;
+      text-align: center;
+    }
+
+    .rating {
+      margin-top: 8px;
+      font-size: 1rem;
+      color: #a5d6a7;
+    }
+
+    .streams {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .stream-link {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 20px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #2a2a2a;
+      border: 1px solid #ffd54f;
+      box-shadow: 0 0 6px #ffd74055;
+      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+      white-space: nowrap;
+    }
+
+    .stream-link:hover {
+      transform: scale(1.05);
+      background-color: #ffd54f;
+      color: #000;
+      box-shadow: 0 0 10px #ffeb3b;
+    }
+
+    .stream-link[title] {
+      position: relative;
+    }
+
+    .stream-link[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      opacity: 0.9;
+      z-index: 100;
+    }
+
+    @media (max-width: 600px) {
+      .movie-card {
+        width: 90%;
+      }
+
+      .streams {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🍿 Top 5 Movie Picks Just for You!</h1>
+  <div class="movie-container">
+
+    <div class="movie-card">
+      <img class="poster" src="https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg" alt="Shawshank Redemption">
+      <div class="title">The Shawshank Redemption (1994)</div>
+      <div class="rating">⭐ Predicted: 4.36</div>
+      <div class="streams">
+        <a class="stream-link" href="https://www.netflix.com/search?q=Shawshank%20Redemption" target="_blank" title="Click to watch on Netflix">Netflix</a>
+        <a class="stream-link" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=Shawshank%20Redemption" target="_blank" title="Click to watch on Prime Video">Prime</a>
+        <a class="stream-link" href="https://www.disneyplus.com/search/Shawshank%20Redemption" target="_blank" title="Click to watch on Disney+">Disney+</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://m.media-amazon.com/images/I/71c05lTE03L._AC_SY679_.jpg" alt="Pulp Fiction">
+      <div class="title">Pulp Fiction (1994)</div>
+      <div class="rating">⭐ Predicted: 4.32</div>
+      <div class="streams">
+        <a class="stream-link" href="https://www.netflix.com/search?q=Pulp%20Fiction" target="_blank" title="Click to watch on Netflix">Netflix</a>
+        <a class="stream-link" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=Pulp%20Fiction" target="_blank" title="Click to watch on Prime Video">Prime</a>
+        <a class="stream-link" href="https://www.disneyplus.com/search/Pulp%20Fiction" target="_blank" title="Click to watch on Disney+">Disney+</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://m.media-amazon.com/images/I/41+eK8zBwQL._AC_.jpg" alt="The Godfather">
+      <div class="title">The Godfather (1972)</div>
+      <div class="rating">⭐ Predicted: 4.25</div>
+      <div class="streams">
+        <a class="stream-link" href="https://www.netflix.com/search?q=The%20Godfather" target="_blank" title="Click to watch on Netflix">Netflix</a>
+        <a class="stream-link" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=The%20Godfather" target="_blank" title="Click to watch on Prime Video">Prime</a>
+        <a class="stream-link" href="https://www.disneyplus.com/search/The%20Godfather" target="_blank" title="Click to watch on Disney+">Disney+</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://m.media-amazon.com/images/I/51Qvs9i5a%2BL._AC_.jpg" alt="LOTR Return of the King">
+      <div class="title">LOTR: Return of the King (2003)</div>
+      <div class="rating">⭐ Predicted: 4.24</div>
+      <div class="streams">
+        <a class="stream-link" href="https://www.netflix.com/search?q=The%20Return%20of%20the%20King" target="_blank" title="Click to watch on Netflix">Netflix</a>
+        <a class="stream-link" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=The%20Return%20of%20the%20King" target="_blank" title="Click to watch on Prime Video">Prime</a>
+        <a class="stream-link" href="https://www.disneyplus.com/search/The%20Return%20of%20the%20King" target="_blank" title="Click to watch on Disney+">Disney+</a>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://m.media-amazon.com/images/I/51v5ZpFyaFL._AC_.jpg" alt="Fight Club">
+      <div class="title">Fight Club (1999)</div>
+      <div class="rating">⭐ Predicted: 4.24</div>
+      <div class="streams">
+        <a class="stream-link" href="https://www.netflix.com/search?q=Fight%20Club" target="_blank" title="Click to watch on Netflix">Netflix</a>
+        <a class="stream-link" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=Fight%20Club" target="_blank" title="Click to watch on Prime Video">Prime</a>
+        <a class="stream-link" href="https://www.disneyplus.com/search/Fight%20Club" target="_blank" title="Click to watch on Disney+">Disney+</a>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

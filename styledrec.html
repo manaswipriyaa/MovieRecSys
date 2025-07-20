@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🎬 Top-N Movie Recommendations</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #ffcc00;
+        }
+
+        .movie-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .movie-card {
+            background: #1f1f1f;
+            border-radius: 20px;
+            width: 200px;
+            padding: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(255, 204, 0, 0.7);
+        }
+
+        .poster {
+            border-radius: 12px;
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .title {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffe082;
+            text-shadow: 0 0 6px #ffd740;
+        }
+
+        .rating {
+            margin-top: 8px;
+            font-size: 1rem;
+            color: #a5d6a7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍿 Top 5 Movie Picks Just for You!</h1>
+    <div class="movie-container">
+        <div class="movie-card">
+            <img class="poster" src="https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg" alt="Shawshank Redemption">
+            <div class="title">The Shawshank Redemption (1994)</div>
+            <div class="rating">⭐ Predicted: 4.36</div>
+        </div>        
+        <div class="movie-card">
+            <img class="poster" src="https://m.media-amazon.com/images/I/71c05lTE03L._AC_SY679_.jpg" alt="Pulp Fiction">
+            <div class="title">Pulp Fiction (1994)</div>
+            <div class="rating">⭐ Predicted: 4.32</div>
+        </div>
+        <div class="movie-card">
+            <img class="poster" src="https://m.media-amazon.com/images/I/41+eK8zBwQL._AC_.jpg" alt="The Godfather">
+            <div class="title">The Godfather (1972)</div>
+            <div class="rating">⭐ Predicted: 4.25</div>
+        </div>
+        <div class="movie-card">
+            <img class="poster" src="https://m.media-amazon.com/images/I/51Qvs9i5a%2BL._AC_.jpg" alt="LOTR Return of the King">
+            <div class="title">LOTR: Return of the King (2003)</div>
+            <div class="rating">⭐ Predicted: 4.24</div>
+        </div>
+        <div class="movie-card">
+            <img class="poster" src="https://m.media-amazon.com/images/I/51v5ZpFyaFL._AC_.jpg" alt="Fight Club">
+            <div class="title">Fight Club (1999)</div>
+            <div class="rating">⭐ Predicted: 4.24</div>
+        </div>
+    </div>
+</body>
+</html>
