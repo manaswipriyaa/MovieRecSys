@@ -1,6 +1,3 @@
-# Project
-A Hybrid Movie Recommendation System built using SVD and Content-based filtering with rich UI
-
 # 🎬 Movie Recommendation System
 
 A hybrid movie recommendation system that combines **Collaborative Filtering (SVD)** and **Content-Based Filtering** with a visually rich HTML output.
