@@ -1,10 +1,10 @@
-#🎬 Movie Recommendation System
+🎬 Movie Recommendation System
 
 A Hybrid Approach Using Content-Based + Collaborative Filtering
 
 This project predicts top movie recommendations by combining collaborative filtering (SVD) and content-based filtering techniques. The system not only suggests highly relevant movies but also enhances user experience through:
 
-#🚀 Key Features:
+🚀 Key Features:
 
 🎯 Hybrid Recommendation Logic
 Combines user preferences and movie metadata (genres, ratings, etc.) for smarter suggestions.
@@ -27,7 +27,7 @@ Built-in theme switcher with glowing UI effects.
 🎨 Responsive UI
 Stylish movie ticket-style layout using HTML, CSS, JavaScript.
 
-#🛠️ Tech Stack:
+🛠️ Tech Stack:
 
 Frontend: HTML5, CSS3, JavaScript (Fetch API)
 
