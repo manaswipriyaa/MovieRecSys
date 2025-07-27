@@ -46,5 +46,6 @@ A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Col
 
 ## 📸 Sample Output
 
+<img width="1887" height="846" alt="image" src="https://github.com/user-attachments/assets/7f6d8967-e31c-43e1-b682-d7746305fcf3" /> 
 <img width="1891" height="825" alt="Screenshot 2025-07-27 231231" src="https://github.com/user-attachments/assets/03782e61-d42f-46ea-9002-1e747cacb94f" />
 
