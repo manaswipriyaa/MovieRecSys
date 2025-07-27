@@ -1,38 +1,50 @@
-🎬 Movie Recommendation System
+# 🎬 Movie Recommendation System
 
-A Hybrid Approach Using Content-Based + Collaborative Filtering
+A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Collaborative Filtering** to provide personalized suggestions. Users can explore movie recommendations along with visuals, metadata, trailers, and streaming platform links — all wrapped in an interactive UI with light/dark mode support.
 
-This project predicts top movie recommendations by combining collaborative filtering (SVD) and content-based filtering techniques. The system not only suggests highly relevant movies but also enhances user experience through:
+## 🔥 Features
 
-🚀 Key Features:
+- 🎯 **Hybrid Recommendation Logic**  
+  Uses **SVD** (collaborative) + **cosine similarity** (content-based) for improved predictions.
+  
+- 🖼️ **Dynamic Posters & Metadata**  
+  Automatically fetches posters, genre badges, and ratings using **TMDB API**.
 
-🎯 Hybrid Recommendation Logic
-Combines user preferences and movie metadata (genres, ratings, etc.) for smarter suggestions.
+- 🎞️ **Watch Trailers**  
+  Trailer previews embedded alongside recommendations.
 
-📸 Dynamic Movie Posters
-Integrated with TMDB API to fetch movie posters and trailers.
+- 📺 **Streaming Platform Links**  
+  Stream directly on platforms like Netflix, Prime Video, etc., with clickable icons.
 
-⭐ Ratings & Genre Tags
-Visual star ratings and genre badges for each movie.
+- 🌙 **Light/Dark Theme Toggle**  
+  Toggle themes with smooth transitions and glowing UI effects.
 
-▶️ Trailer Links
-Embedded preview trailers for each recommended movie.
+- 💻 **Interactive UI**  
+  Styled with modern HTML/CSS and enhanced using JavaScript.
 
-🔗 Streaming Platform Links
-Clickable icons (Netflix, Prime, etc.) to watch instantly.
+---
 
-🌗 Light/Dark Mode Toggle
-Built-in theme switcher with glowing UI effects.
+## 🛠️ Tech Stack
 
-🎨 Responsive UI
-Stylish movie ticket-style layout using HTML, CSS, JavaScript.
+| Layer       | Tools/Technologies                       |
+|-------------|------------------------------------------|
+| Frontend    | HTML5, CSS3, JavaScript (Fetch API)      |
+| Backend     | Python, Flask                            |
+| ML Models   | SVD (Surprise Lib), Cosine Similarity    |
+| APIs Used   | TMDB API for posters, metadata, trailers |
 
-🛠️ Tech Stack:
+---
 
-Frontend: HTML5, CSS3, JavaScript (Fetch API)
+## 📊 How It Works
 
-Backend: Python, Flask
+1. **Collaborative Filtering** recommends based on user-item matrix using **SVD**.
+2. **Content-Based Filtering** matches movie features like genre, keywords, and description using **cosine similarity**.
+3. Both results are combined (weighted average) for the final recommendation list.
+4. Posters, ratings, genres, trailers, and stream links are rendered on a visually appealing webpage.
 
-ML Models: SVD (Collaborative Filtering), Cosine Similarity (Content-Based)
+---
 
-API Integration: TMDB API for metadata and trailers
+## 📸 Sample Output
+
+<img width="1891" height="825" alt="Screenshot 2025-07-27 231231" src="https://github.com/user-attachments/assets/03782e61-d42f-46ea-9002-1e747cacb94f" />
+
