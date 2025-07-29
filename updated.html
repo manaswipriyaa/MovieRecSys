@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Top Movie Recommendations</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff;
+      color: #111;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark-mode {
+      background-color: #111;
+      color: #eee;
+    }
+
+    .container {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .movie-card {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: #f5f5f5;
+      margin: 1.5rem 0;
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.015);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+
+    .dark-mode .movie-card {
+      background: #1e1e1e;
+    }
+
+    .poster {
+      width: 130px;
+      border-radius: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .details {
+      flex: 1;
+    }
+
+    .glow {
+      color: #e50914;
+      text-shadow: 0 0 5px rgba(255, 0, 0, 0.4);
+    }
+
+    .stars {
+      font-size: 1.2rem;
+      color: gold;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #ddd;
+      color: #333;
+      padding: 0.2rem 0.6rem;
+      margin: 0.3rem 0.3rem 0 0;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+
+    .dark-mode .badge {
+      background: #333;
+      color: #eee;
+    }
+
+    .trailer-btn {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: #e50914;
+      color: white;
+      border-radius: 10px;
+      text-decoration: none;
+    }
+
+    .trailer-btn:hover {
+      background: #b00610;
+    }
+
+    .streaming-links {
+      margin-top: 0.5rem;
+      font-weight: bold;
+    }
+
+    .streaming-links a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .streaming-links a:hover {
+      text-decoration: underline;
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      border-radius: 50%;
+      padding: 0.6rem;
+      font-size: 1.2rem;
+      background: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-btn" title="Toggle dark/light mode">🌓</button>
+  <div class="container">
+    <h1>🍿 Your Movie Picks</h1>
+
+    <div class="movie-card">
+      <img class="poster" src="https://image.tmdb.org/t/p/w200/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg" alt="Pulp Fiction">
+      <div class="details">
+        <h2 class="glow">Pulp Fiction (1994)</h2>
+        <div class="stars">⭐️⭐️⭐️⭐️½</div>
+        <p><b>Predicted Rating:</b> 4.35 🎯</p>
+        <div class="badge">Dark Comedy</div><div class="badge">Thriller</div>
+        <div><a class="trailer-btn" href="https://www.youtube.com/results?search_query=Pulp+Fiction+(1994)+trailer" target="_blank">📺 Trailer</a></div>
+        <div class="streaming-links">🎬 Watch on:
+          <a href="https://www.netflix.com/search?q=Pulp%20Fiction" target="_blank">Netflix</a> |
+          <a href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=Pulp%20Fiction" target="_blank">Prime</a> |
+          <a href="https://www.disneyplus.com/search/Pulp%20Fiction" target="_blank">Disney+</a>
+        </div>
+        <i>“You’ll love this if you’re into Dark Comedy and Thrillers.”</i>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://image.tmdb.org/t/p/w200/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg" alt="Shawshank Redemption">
+      <div class="details">
+        <h2 class="glow">The Shawshank Redemption (1994)</h2>
+        <div class="stars">⭐️⭐️⭐️⭐️½</div>
+        <p><b>Predicted Rating:</b> 4.34 🎯</p>
+        <div class="badge">Drama</div><div class="badge">Mystery</div><div class="badge">Detective Fiction</div>
+        <div><a class="trailer-btn" href="https://www.youtube.com/results?search_query=Shawshank+Redemption+trailer" target="_blank">📺 Trailer</a></div>
+        <div class="streaming-links">🎬 Watch on:
+          <a href="https://www.netflix.com/search?q=Shawshank%20Redemption" target="_blank">Netflix</a> |
+          <a href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=Shawshank%20Redemption" target="_blank">Prime</a> |
+          <a href="https://www.disneyplus.com/search/Shawshank%20Redemption" target="_blank">Disney+</a>
+        </div>
+        <i>“You’ll love this if you’re into Drama, Mystery and Detective Fiction.”</i>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://image.tmdb.org/t/p/w200/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg" alt="Fight Club">
+      <div class="details">
+        <h2 class="glow">Fight Club (1999)</h2>
+        <div class="stars">⭐️⭐️⭐️⭐️½</div>
+        <p><b>Predicted Rating:</b> 4.26 🎯</p>
+        <div class="badge">Suspense</div><div class="badge">Thriller</div>
+        <div><a class="trailer-btn" href="https://www.youtube.com/results?search_query=Fight+Club+trailer" target="_blank">📺 Trailer</a></div>
+        <div class="streaming-links">🎬 Watch on:
+          <a href="https://www.netflix.com/search?q=Fight%20Club" target="_blank">Netflix</a> |
+          <a href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=Fight%20Club" target="_blank">Prime</a> |
+          <a href="https://www.disneyplus.com/search/Fight%20Club" target="_blank">Disney+</a>
+        </div>
+        <i>“You’ll love this if you’re into Suspense and Thrillers.”</i>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://image.tmdb.org/t/p/w200/3bhkrj58Vtu7enYsRolD1fZdja1.jpg" alt="The Godfather">
+      <div class="details">
+        <h2 class="glow">The Godfather (1972)</h2>
+        <div class="stars">⭐️⭐️⭐️⭐️½</div>
+        <p><b>Predicted Rating:</b> 4.23 🎯</p>
+        <div class="badge">Crime</div><div class="badge">Action</div>
+        <div><a class="trailer-btn" href="https://www.youtube.com/results?search_query=The+Godfather+trailer" target="_blank">📺 Trailer</a></div>
+        <div class="streaming-links">🎬 Watch on:
+          <a href="https://www.netflix.com/search?q=The%20Godfather" target="_blank">Netflix</a> |
+          <a href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=The%20Godfather" target="_blank">Prime</a> |
+          <a href="https://www.disneyplus.com/search/The%20Godfather" target="_blank">Disney+</a>
+        </div>
+        <i>“You’ll love this if you’re into Crime and Action.”</i>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="poster" src="https://image.tmdb.org/t/p/w200/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg" alt="LOTR: Return of the King">
+      <div class="details">
+        <h2 class="glow">The Lord of the Rings: Return of the King (2003)</h2>
+        <div class="stars">⭐️⭐️⭐️⭐️½</div>
+        <p><b>Predicted Rating:</b> 4.22 🎯</p>
+        <div class="badge">Fantasy</div><div class="badge">Adventure</div>
+        <div><a class="trailer-btn" href="https://www.youtube.com/results?search_query=The+Return+of+the+King+trailer" target="_blank">📺 Trailer</a></div>
+        <div class="streaming-links">🎬 Watch on:
+          <a href="https://www.netflix.com/search?q=The%20Return%20of%20the%20King" target="_blank">Netflix</a> |
+          <a href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=The%20Return%20of%20the%20King" target="_blank">Prime</a> |
+          <a href="https://www.disneyplus.com/search/The%20Return%20of%20the%20King" target="_blank">Disney+</a>
+        </div>
+        <i>“You’ll love this if you’re into Fantasy and Adventure.”</i>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.querySelector('.toggle-btn');
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme',
+        document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>
