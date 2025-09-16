@@ -1,30 +1,30 @@
-# 🎬 Movie Recommendation System
+# Movie Recommendation System
 
 A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Collaborative Filtering** to provide personalized suggestions. Users can explore movie recommendations along with visuals, metadata, trailers, and streaming platform links — all wrapped in an interactive UI with light/dark mode support.
 
-## 🔥 Features
+## Features
 
-- 🎯 **Hybrid Recommendation Logic**  
+-  **Hybrid Recommendation Logic**  
   Uses **SVD** (collaborative) + **cosine similarity** (content-based) for improved predictions.
   
-- 🖼️ **Dynamic Posters & Metadata**  
+-  **Dynamic Posters & Metadata**  
   Automatically fetches posters, genre badges, and ratings using **TMDB API**.
 
-- 🎞️ **Watch Trailers**  
+-  **Watch Trailers**  
   Trailer previews embedded alongside recommendations.
 
-- 📺 **Streaming Platform Links**  
+-  **Streaming Platform Links**  
   Stream directly on platforms like Netflix, Prime Video, etc., with clickable icons.
 
-- 🌙 **Light/Dark Theme Toggle**  
+-  **Light/Dark Theme Toggle**  
   Toggle themes with smooth transitions and glowing UI effects.
 
-- 💻 **Interactive UI**  
+-  **Interactive UI**  
   Styled with modern HTML/CSS and enhanced using JavaScript.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer       | Tools/Technologies                       |
 |-------------|------------------------------------------|
@@ -35,7 +35,7 @@ A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Col
 
 ---
 
-## 📊 How It Works
+## How It Works
 
 1. **Collaborative Filtering** recommends based on user-item matrix using **SVD**.
 2. **Content-Based Filtering** matches movie features like genre, keywords, and description using **cosine similarity**.
@@ -44,7 +44,7 @@ A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Col
 
 ---
 
-## 📸 Sample Output
+## Sample Output
 
 <img width="1891" height="825" alt="Screenshot 2025-07-27 231231" src="https://github.com/user-attachments/assets/03782e61-d42f-46ea-9002-1e747cacb94f" />
 
