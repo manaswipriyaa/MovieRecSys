@@ -52,5 +52,5 @@ A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Col
 
 ## Author
 **Maddu Manaswi Priya**  
-**August 2025**
+**July 2025**
 
