@@ -1,6 +1,6 @@
-# MovieRecSys — Hybrid Movie Recommendation System
+# MovieRecSys - Hybrid Movie Recommendation System
 
-A college project that builds a hybrid movie recommendation engine combining collaborative filtering and content-based filtering — deployed as an interactive web app using Streamlit.
+A college project that builds a hybrid movie recommendation engine combining collaborative filtering and content-based filtering - deployed as an interactive web app using Streamlit.
 
 ---
 
@@ -106,6 +106,6 @@ jupyter notebook notebooks/recommendation_system.ipynb
 ## Author
 
 **Manaswi Priya Maddu**
-B.Tech — AI & Machine Learning | Acharya Nagarjuna University
-*(College Project — Acharya Nagarjuna University, 2025)*
+B.Tech - AI & Machine Learning | Acharya Nagarjuna University
+*(College Project - Acharya Nagarjuna University, 2025)*
 [LinkedIn](https://linkedin.com/in/manaswi-priya-2126481b8) | [GitHub](https://github.com/manaswipriyaa)
