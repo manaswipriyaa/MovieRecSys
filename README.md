@@ -107,5 +107,5 @@ jupyter notebook notebooks/recommendation_system.ipynb
 
 **Manaswi Priya Maddu**
 B.Tech - AI & Machine Learning | Acharya Nagarjuna University
-*(College Project - Acharya Nagarjuna University, 2025)*
+(College Project - Acharya Nagarjuna University, 2025)
 [LinkedIn](https://linkedin.com/in/manaswi-priya-2126481b8) | [GitHub](https://github.com/manaswipriyaa)
