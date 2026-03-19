@@ -33,7 +33,7 @@ header { display: none !important; }
     border-bottom: 1px solid rgba(255,255,255,0.06);
     padding: 0 40px;
     height: 60px;
-    display: flex; align-items: center; gap: 32px;
+    display: flex; align-items: center; gap: 24px;
 }
 .topbar-logo {
     font-family: 'Bebas Neue', cursive;
@@ -43,17 +43,7 @@ header { display: none !important; }
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     flex-shrink: 0;
 }
-.topbar-nav { display: flex; gap: 6px; }
-.topbar-navitem {
-    font-size: 0.78rem; color: #666; letter-spacing: 1.5px;
-    text-transform: uppercase; font-weight: 500;
-    padding: 6px 16px; border-radius: 50px;
-    border: 1px solid transparent; white-space: nowrap;
-}
-.topbar-navitem.active {
-    color: white; background: rgba(124,109,250,0.15);
-    border-color: rgba(124,109,250,0.35);
-}
+.topbar-nav { display: none; }
 
 /* ── HERO BANNER ── */
 .hero-banner {
@@ -202,17 +192,29 @@ header { display: none !important; }
 .rec-bar { background: linear-gradient(90deg, #7c6dfa, #e040fb); border-radius: 50px; height: 4px; }
 .rec-score { font-size: 0.75rem; color: #7c6dfa; margin-top: 5px; font-weight: 500; }
 
-/* Hide nav row buttons — navigation is in topbar HTML only */
-[data-testid="column"]:nth-child(1) .stButton > button,
-[data-testid="column"]:nth-child(2) .stButton > button {
-    background: transparent !important;
-    color: transparent !important;
+/* Nav pill buttons - small and tight */
+[data-testid="column"]:nth-child(2) .stButton > button,
+[data-testid="column"]:nth-child(3) .stButton > button {
+    background: rgba(255,255,255,0.05) !important;
+    color: #aaa !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 50px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    padding: 5px 16px !important;
     box-shadow: none !important;
-    border: none !important;
-    height: 0 !important; padding: 0 !important; margin: 0 !important;
-    overflow: hidden !important; font-size: 0 !important;
-    pointer-events: none !important;
-    position: absolute !important;
+    margin-top: -52px !important;
+    position: relative !important;
+    z-index: 200 !important;
+    width: auto !important;
+}
+[data-testid="column"]:nth-child(2) .stButton > button:hover,
+[data-testid="column"]:nth-child(3) .stButton > button:hover {
+    background: rgba(124,109,250,0.15) !important;
+    color: white !important;
+    border-color: rgba(124,109,250,0.4) !important;
 }
 
 /* Streamlit button override */
@@ -304,25 +306,19 @@ ratings_df, movies_df = load_data()
 st.markdown(f"""
 <div class="topbar">
     <div class="topbar-logo">MOVIERECSYS</div>
-    <div class="topbar-nav">
-        <span class="topbar-navitem {'active' if st.session_state.page=='home' else ''}">Browse</span>
-        <span class="topbar-navitem {'active' if st.session_state.page=='recs' else ''}">For You</span>
-    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Hidden nav buttons — placed in zero-height container
-st.markdown('<div style="height:0;overflow:hidden;position:absolute;">', unsafe_allow_html=True)
-nc1, nc2 = st.columns(2)
-with nc1:
+# Nav buttons embedded inside topbar via columns trick
+nav_c1, nav_c2, nav_c3 = st.columns([2, 1, 1])
+with nav_c2:
     if st.button("Browse", key="nb1"):
         st.session_state.page = 'home'
         st.rerun()
-with nc2:
+with nav_c3:
     if st.button("For You", key="nb2"):
         st.session_state.page = 'recs'
         st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found! Please add data/ratings.csv and data/movies.csv")
@@ -351,12 +347,14 @@ if st.session_state.page == 'home':
     </div>
     """, unsafe_allow_html=True)
 
-    # Hero CTA button
-    hc1, hc2, hc3 = st.columns([2, 1, 5])
-    with hc1:
+    # Hero CTA — positioned under hero, left-aligned
+    st.markdown('<div style="padding:16px 48px 0;">', unsafe_allow_html=True)
+    hero_c1, hero_c2 = st.columns([1, 5])
+    with hero_c1:
         if st.button("Get Personalised Recs", key="hero_cta"):
             st.session_state.page = 'recs'
             st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
@@ -413,22 +411,23 @@ if st.session_state.page == 'home':
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Bottom CTA strip
+    # Bottom CTA strip — button centered inside banner
     st.markdown("""
-    <div style="background:linear-gradient(135deg,#0d0b2b,#1a0533);padding:60px 48px;text-align:center;margin-top:40px;">
-        <div style="font-family:'Bebas Neue',cursive;font-size:2.4rem;letter-spacing:3px;color:white;margin-bottom:12px;">
+    <div style="background:linear-gradient(135deg,#0d0b2b,#1a0533);padding:50px 48px 30px;text-align:center;margin-top:40px;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:3px;color:white;margin-bottom:10px;">
             Not sure what to watch?
         </div>
-        <div style="color:#666;font-size:0.9rem;margin-bottom:28px;font-weight:300;">
+        <div style="color:#666;font-size:0.85rem;margin-bottom:0;font-weight:300;">
             Tell us your favourite genres and we'll pick the perfect movies for you.
         </div>
     </div>
     """, unsafe_allow_html=True)
-    bc1, bc2, bc3 = st.columns([3, 1, 3])
+    bc1, bc2, bc3 = st.columns([2, 1, 2])
     with bc2:
         if st.button("Find My Movies", key="bottom_cta"):
             st.session_state.page = 'recs'
             st.rerun()
+    st.markdown('<div style="background:linear-gradient(135deg,#0d0b2b,#1a0533);height:40px;"></div>', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: FOR YOU
