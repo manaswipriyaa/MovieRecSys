@@ -1,56 +1,47 @@
-# Movie Recommendation System
+# 🎬 MovieRecSys
 
-A **Hybrid Movie Recommender** that blends **Content-Based Filtering** and **Collaborative Filtering** to provide personalized suggestions. Users can explore movie recommendations along with visuals, metadata, trailers, and streaming platform links — all wrapped in an interactive UI with light/dark mode support.
+A personalized movie recommendation system built with Streamlit, supporting both Content-Based (TF-IDF) and Collaborative Filtering (SVD) algorithms.
 
-## Features
+## 🚀 Live Demo
+> Deploy link will appear here after deployment
 
--  **Hybrid Recommendation Logic**  
-  Uses **SVD** (collaborative) + **cosine similarity** (content-based) for improved predictions.
-  
--  **Dynamic Posters & Metadata**  
-  Automatically fetches posters, genre badges, and ratings using **TMDB API**.
+## 📁 Project Setup
 
--  **Watch Trailers**  
-  Trailer previews embedded alongside recommendations.
+### 1. Add the MovieLens Dataset
 
--  **Streaming Platform Links**  
-  Stream directly on platforms like Netflix, Prime Video, etc., with clickable icons.
+Download from [grouplens.org/datasets/movielens](https://grouplens.org/datasets/movielens/) and place files in a `data/` folder:
 
--  **Light/Dark Theme Toggle**  
-  Toggle themes with smooth transitions and glowing UI effects.
+```
+MovieRecSys/
+├── app.py
+├── requirements.txt
+├── .streamlit/
+│   └── config.toml
+└── data/
+    ├── ratings.csv
+    └── movies.csv
+```
 
--  **Interactive UI**  
-  Styled with modern HTML/CSS and enhanced using JavaScript.
+### 2. Run Locally
 
----
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-## Tech Stack
+## ☁️ Deploy to Streamlit Cloud (Free)
 
-| Layer       | Tools/Technologies                       |
-|-------------|------------------------------------------|
-| Frontend    | HTML5, CSS3, JavaScript (Fetch API)      |
-| Backend     | Python, Flask                            |
-| ML Models   | SVD (Surprise Lib), Cosine Similarity    |
-| APIs Used   | TMDB API for posters, metadata, trailers |
+1. Push this repo to GitHub
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Sign in with GitHub
+4. Click **New app** → select this repo
+5. Set **Main file path** to `app.py`
+6. Click **Deploy!**
 
----
+## 🎯 Features
 
-## How It Works
-
-1. **Collaborative Filtering** recommends based on user-item matrix using **SVD**.
-2. **Content-Based Filtering** matches movie features like genre, keywords, and description using **cosine similarity**.
-3. Both results are combined (weighted average) for the final recommendation list.
-4. Posters, ratings, genres, trailers, and stream links are rendered on a visually appealing webpage.
-
----
-
-## Sample Output
-
-<img width="1891" height="825" alt="Screenshot 2025-07-27 231231" src="https://github.com/user-attachments/assets/03782e61-d42f-46ea-9002-1e747cacb94f" />
-
----
-
-## Author
-**Maddu Manaswi Priya**  
-**July 2025**
-
+- 🔍 Content-Based Filtering using TF-IDF on movie genres
+- 🤖 Collaborative Filtering using SVD (matrix factorization)
+- 🎨 Netflix-inspired dark UI
+- 📊 Visual bar charts of recommendations
+- ⬇️ Download recommendations as CSV
