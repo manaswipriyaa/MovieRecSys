@@ -384,6 +384,8 @@ def render_detail(title):
             <div class="detail-backdrop-fade"></div>
         </div>''', unsafe_allow_html=True)
 
+    tagline_html = f'<div class="detail-tagline">"{tagline}"</div>' if tagline else ""
+
     poster_html = f'<img class="detail-poster" src="{poster}"/>' if poster \
                   else '<div class="detail-poster-ph">🎬</div>'
     genre_pills = ''.join([f'<span class="detail-genre-pill">{g}</span>' for g in genres])
@@ -398,7 +400,7 @@ def render_detail(title):
                 <span class="detail-rating">⭐ {rating} / 10</span>
                 <span class="detail-runtime">{runtime}</span>
             </div>
-            {f\'<div class="detail-tagline">"{tagline}"</div>\' if tagline else ""}
+            {tagline_html}
             <div class="detail-overview">{overview}</div>
             <div>{genre_pills}</div>
         </div>
