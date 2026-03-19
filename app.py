@@ -31,27 +31,36 @@ header { display: none !important; }
     background: linear-gradient(180deg, rgba(6,7,20,0.98) 0%, rgba(6,7,20,0.85) 100%);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,0.06);
-    padding: 0 48px;
-    height: 64px;
-    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px;
+    height: 60px;
+    display: flex; align-items: center; gap: 32px;
 }
 .topbar-logo {
     font-family: 'Bebas Neue', cursive;
-    font-size: 2rem;
+    font-size: 1.8rem;
     letter-spacing: 4px;
     background: linear-gradient(90deg, #7c6dfa, #e040fb, #ff4081);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    flex-shrink: 0;
 }
-.topbar-nav { display: flex; gap: 32px; }
-.topbar-navitem { font-size: 0.82rem; color: #888; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; }
-.topbar-navitem.active { color: white; }
+.topbar-nav { display: flex; gap: 6px; }
+.topbar-navitem {
+    font-size: 0.78rem; color: #666; letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 500;
+    padding: 6px 16px; border-radius: 50px;
+    border: 1px solid transparent; white-space: nowrap;
+}
+.topbar-navitem.active {
+    color: white; background: rgba(124,109,250,0.15);
+    border-color: rgba(124,109,250,0.35);
+}
 
 /* ── HERO BANNER ── */
 .hero-banner {
-    position: relative; width: 100%; height: 520px; overflow: hidden;
+    position: relative; width: 100%; height: 340px; overflow: hidden;
     background: linear-gradient(135deg, #0d0b2b 0%, #1a0533 50%, #0a1628 100%);
     display: flex; align-items: flex-end;
-    padding: 0 64px 60px;
+    padding: 0 48px 40px;
     margin-bottom: 0;
 }
 .hero-bg-glow {
@@ -76,14 +85,14 @@ header { display: none !important; }
 }
 .hero-title {
     font-family: 'Bebas Neue', cursive;
-    font-size: 5rem; line-height: 0.95; letter-spacing: 3px;
+    font-size: 3.2rem; line-height: 0.95; letter-spacing: 3px;
     color: white; margin-bottom: 18px;
 }
 .hero-title span {
     background: linear-gradient(90deg, #7c6dfa, #e040fb);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.hero-desc { font-size: 0.95rem; color: #9090b0; line-height: 1.7; margin-bottom: 28px; font-weight: 300; }
+.hero-desc { font-size: 0.85rem; color: #9090b0; line-height: 1.6; margin-bottom: 20px; font-weight: 300; }
 .hero-cta {
     display: inline-block;
     background: linear-gradient(135deg, #7c6dfa, #e040fb);
@@ -193,6 +202,19 @@ header { display: none !important; }
 .rec-bar { background: linear-gradient(90deg, #7c6dfa, #e040fb); border-radius: 50px; height: 4px; }
 .rec-score { font-size: 0.75rem; color: #7c6dfa; margin-top: 5px; font-weight: 500; }
 
+/* Hide nav row buttons — navigation is in topbar HTML only */
+[data-testid="column"]:nth-child(1) .stButton > button,
+[data-testid="column"]:nth-child(2) .stButton > button {
+    background: transparent !important;
+    color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    height: 0 !important; padding: 0 !important; margin: 0 !important;
+    overflow: hidden !important; font-size: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+
 /* Streamlit button override */
 .stButton > button {
     background: linear-gradient(135deg, #7c6dfa, #e040fb) !important;
@@ -289,8 +311,9 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Nav buttons (invisible — styled via CSS)
-nc1, nc2, nc3 = st.columns([1, 1, 10])
+# Hidden nav buttons — placed in zero-height container
+st.markdown('<div style="height:0;overflow:hidden;position:absolute;">', unsafe_allow_html=True)
+nc1, nc2 = st.columns(2)
 with nc1:
     if st.button("Browse", key="nb1"):
         st.session_state.page = 'home'
@@ -299,6 +322,7 @@ with nc2:
     if st.button("For You", key="nb2"):
         st.session_state.page = 'recs'
         st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found! Please add data/ratings.csv and data/movies.csv")
