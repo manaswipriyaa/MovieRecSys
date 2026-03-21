@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import os, re, requests, urllib.parse
+import os, re, requests, urllib.parse, html
 
 st.set_page_config(page_title="CineMatch", layout="wide", initial_sidebar_state="collapsed")
 
@@ -42,7 +42,7 @@ for k, v in {"page": "home", "prev": "home", "movie": None,
         st.session_state[k] = v
 
 # ─────────────────────────────────────────────────────────────────
-# CSS
+# ENHANCED CSS WITH PROPER SPACING & LAYOUT FIXES
 # ─────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -69,43 +69,31 @@ html, body, [class*="css"] {
 .stApp { background: var(--bg) !important; color: var(--txt); }
 
 /* Strip all Streamlit padding */
-.block-container                           { padding: 0 !important; max-width: 100% !important; }
-section[data-testid="stMain"] > div       { padding: 0 !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
+section[data-testid="stMain"] > div { padding: 0 !important; }
 div[data-testid="stSidebar"], footer, header { display: none !important; }
 div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
-.stVerticalBlock                           { gap: 0 !important; }
-/* remove gap that appears above first element */
-.stMainBlockContainer > div:first-child   { margin-top: 0 !important; }
+.stVerticalBlock { gap: 0 !important; }
+.stMainBlockContainer > div:first-child { margin-top: 0 !important; }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--subtle); border-radius: 3px; }
 
-/* ═══════════════════════════════════════
-   PAGE SHELL  — centred, breathing room
-═══════════════════════════════════════ */
-.shell {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 60px;
-}
-
-/* ═══════════════════════════════════════
-   NAV  — 100% HTML, always visible
-═══════════════════════════════════════ */
+/* NAV — sticky, clean */
 .nav {
   position: sticky;
   top: 0;
   z-index: 9999;
-  background: rgba(8,9,14,0.97);
+  background: rgba(8,9,14,0.98);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--bdr);
 }
 .nav-inner {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 60px;
   height: 62px;
   display: flex;
   align-items: center;
@@ -122,7 +110,10 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   flex-shrink: 0;
   margin-right: 40px;
   text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
 }
+.nav-logo:hover { color: var(--gold2); }
 .nav-sep {
   width: 1px; height: 18px;
   background: var(--bdr);
@@ -133,6 +124,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   display: flex;
   align-items: center;
   gap: 2px;
+  margin-left: auto;
 }
 .nav-link {
   font-family: 'Outfit', sans-serif;
@@ -162,9 +154,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   vertical-align: middle;
 }
 
-/* ═══════════════════════════════════════
-   STREAMLIT BUTTONS (action only, no nav)
-═══════════════════════════════════════ */
+/* BUTTONS */
 .stButton > button {
   background: var(--gold) !important;
   color: #08090e !important;
@@ -181,9 +171,8 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   min-width: 0 !important;
   white-space: nowrap !important;
   transition: opacity 0.15s !important;
-  transform: none !important;
 }
-.stButton > button:hover { opacity: 0.85 !important; transform: none !important; }
+.stButton > button:hover { opacity: 0.85 !important; }
 
 .btn-ghost .stButton > button {
   background: transparent !important;
@@ -208,7 +197,6 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   font-size: 0.72rem !important;
   padding: 9px 22px !important;
   text-transform: none !important;
-  letter-spacing: 0.5px !important;
 }
 
 .stDownloadButton > button {
@@ -220,9 +208,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   padding: 8px 18px !important;
 }
 
-/* ═══════════════════════════════════════
-   HERO
-═══════════════════════════════════════ */
+/* HERO */
 .hero {
   background: linear-gradient(155deg, #0c0b1c 0%, #0f0c1f 55%, #080912 100%);
   border-bottom: 1px solid var(--bdr);
@@ -236,7 +222,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 65%);
   pointer-events: none;
 }
-.hero-body { max-width: 1200px; margin: 0 auto; padding: 52px 80px 44px; }
+.hero-body { max-width: 1400px; margin: 0 auto; padding: 52px 60px 44px; }
 .hero-eye {
   font-size: 0.58rem; letter-spacing: 4px; text-transform: uppercase;
   color: var(--gold); font-weight: 500; margin-bottom: 14px;
@@ -252,17 +238,14 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   max-width: 420px; font-weight: 300;
 }
 
-/* ═══════════════════════════════════════
-   MOVIE CARD — entire card is an <a> link
-   NO buttons, NO icons below/inside
-═══════════════════════════════════════ */
+/* MOVIE CARD */
 a.mc { display: block; text-decoration: none; color: inherit; }
 .mcard {
   border-radius: 8px; overflow: hidden;
   background: var(--surf); border: 1px solid var(--bdr);
   transition: transform 0.22s cubic-bezier(0.22,0.68,0,1.2),
               box-shadow 0.22s, border-color 0.2s;
-  position: relative; cursor: pointer;
+  position: relative; cursor: pointer; height: 100%;
 }
 a.mc:hover .mcard {
   transform: translateY(-7px) scale(1.012);
@@ -298,9 +281,17 @@ a.mc:hover .mcard-ov { opacity: 1; }
 }
 .mcard-genre { font-size: 0.59rem; color: var(--muted); }
 
-/* ═══════════════════════════════════════
-   SECTION HELPERS
-═══════════════════════════════════════ */
+/* GRID WRAPPER WITH PROPER SPACING */
+.movie-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px;
+}
+
+/* SECTION HELPERS */
 .divider { height: 1px; background: var(--bdr); }
 .sec-eye {
   font-size: 0.58rem; letter-spacing: 3.5px; text-transform: uppercase;
@@ -312,31 +303,36 @@ a.mc:hover .mcard-ov { opacity: 1; }
 }
 .count { font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; font-weight: 500; margin: 14px 0 18px; }
 
-/* ═══════════════════════════════════════
-   BOTTOM BANNER
-   Text on left, button on right — same row
-═══════════════════════════════════════ */
-.btm { background: linear-gradient(120deg, #100e24, #17102a); border-top: 1px solid rgba(201,169,110,0.1); margin-top: 52px; border-radius: 0; }
-.btm-inner {
-  max-width: 1200px; margin: 0 auto; padding: 40px 80px;
-  display: flex; align-items: center;
-  justify-content: space-between; gap: 48px; flex-wrap: nowrap;
+/* BOTTOM BANNER */
+.btm {
+  background: linear-gradient(120deg, #100e24, #17102a);
+  border-top: 1px solid rgba(201,169,110,0.1);
+  margin-top: 52px;
+  border-radius: 0;
 }
-.btm-text { flex: 1; }
+.btm-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.btm-text { flex: 1; min-width: 300px; }
 .btm-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.25rem; color: #fff; margin-bottom: 8px; }
 .btm-sub { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
 
-/* ═══════════════════════════════════════
-   DETAIL PAGE
-═══════════════════════════════════════ */
-.det-top  { max-width: 1200px; margin: 0 auto; padding: 22px 80px 0; }
+/* DETAIL PAGE */
 .det-backdrop { width: 100%; height: 210px; position: relative; overflow: hidden; }
 .det-backdrop img { width: 100%; height: 100%; object-fit: cover; opacity: 0.18; display: block; }
 .det-fade { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 55%); }
-.det-body { max-width: 1200px; margin: 0 auto; padding: 0 80px 56px; }
+
 .det-flex { display: flex; gap: 40px; align-items: flex-start; margin-top: -72px; position: relative; z-index: 2; }
 .det-poster { width: 175px; min-width: 175px; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.88); display: block; }
 .det-poster-ph { width: 175px; min-width: 175px; height: 262px; border-radius: 10px; background: var(--surf2); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; }
+
 .det-info { flex: 1; padding-top: 80px; }
 .det-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(1.5rem,3vw,2.5rem); color: #fff; line-height: 1.08; margin-bottom: 12px; }
 .det-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 13px; }
@@ -347,7 +343,8 @@ a.mc:hover .mcard-ov { opacity: 1; }
 .det-pill { display: inline-block; background: rgba(255,255,255,0.04); color: #aaa; font-size: 0.67rem; padding: 3px 11px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.07); margin-right: 5px; margin-bottom: 5px; }
 .trailer-a { display: inline-flex; align-items: center; gap: 8px; background: rgba(224,92,92,0.1); color: #ef8080; font-size: 0.73rem; font-weight: 600; padding: 9px 20px; border-radius: 6px; border: 1px solid rgba(224,92,92,0.2); text-decoration: none; }
 .trailer-a:hover { background: rgba(224,92,92,0.18); }
-.sub-sec { max-width: 1200px; margin: 0 auto; padding: 26px 80px; border-top: 1px solid var(--bdr); }
+
+.sub-sec { border-top: 1px solid var(--bdr); }
 .sub-h { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 16px; }
 .providers { display: flex; flex-wrap: wrap; gap: 10px; }
 .prov { background: var(--surf); border-radius: 9px; border: 1px solid var(--bdr); padding: 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 84px; text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
@@ -355,6 +352,7 @@ a.mc:hover .mcard-ov { opacity: 1; }
 .prov img { width: 40px; height: 40px; border-radius: 7px; object-fit: cover; }
 .prov-n { font-size: 0.61rem; color: #888; text-align: center; }
 .prov-t { font-size: 0.55rem; color: var(--muted); }
+
 .cast-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(84px,1fr)); gap: 9px; }
 .cast-card { background: var(--surf); border-radius: 7px; overflow: hidden; border: 1px solid var(--bdr); }
 .cast-card:hover { border-color: rgba(201,169,110,0.22); }
@@ -363,10 +361,7 @@ a.mc:hover .mcard-ov { opacity: 1; }
 .cast-name { font-size: 0.63rem; font-weight: 600; color: #bbb; padding: 5px 6px 2px; }
 .cast-char { font-size: 0.56rem; color: var(--muted); padding: 0 6px 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ═══════════════════════════════════════
-   FOR YOU / REC CARDS
-   Each entire card is an <a> — click opens detail
-═══════════════════════════════════════ */
+/* REC CARDS */
 a.rc { display: block; text-decoration: none; color: inherit; margin-bottom: 10px; }
 .rec-card { background: var(--surf); border-radius: 10px; border: 1px solid var(--bdr); padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s; cursor: pointer; }
 a.rc:hover .rec-card { border-color: rgba(201,169,110,0.28); transform: translateX(3px); box-shadow: 0 4px 22px rgba(0,0,0,0.4); }
@@ -383,21 +378,21 @@ a.rc:hover .rec-card { border-color: rgba(201,169,110,0.28); transform: translat
 .rec-hint { font-size: 0.6rem; color: var(--muted); margin-top: 3px; }
 .chart-panel { background: var(--surf); border: 1px solid var(--bdr); border-radius: 10px; padding: 20px; }
 
-/* ═══════════════════════════════════════
-   WATCHLIST EMPTY
-═══════════════════════════════════════ */
+/* WATCHLIST EMPTY */
 .wl-empty { text-align: center; padding: 72px 40px; color: var(--muted); }
 .wl-empty-icon { font-size: 2.8rem; margin-bottom: 14px; }
 .wl-empty-h { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #fff; margin-bottom: 8px; }
 
-/* ═══════════════════════════════════════
-   INPUTS
-═══════════════════════════════════════ */
-.stTextInput input { background: var(--surf) !important; color: var(--txt) !important; border: 1px solid rgba(255,255,255,0.09) !important; border-radius: 7px !important; font-size: 0.85rem !important; font-family: 'Outfit', sans-serif !important; }
+/* INPUTS */
+.stTextInput input { background: var(--surf) !important; color: var(--txt) !important; border: 1px solid rgba(255,255,255,0.09) !important; border-radius: 7px !important; font-size: 0.85rem !important; font-family: 'Outfit', sans-serif !important; padding: 8px 12px !important; }
 .stTextInput input:focus { border-color: rgba(201,169,110,0.4) !important; box-shadow: 0 0 0 2px rgba(201,169,110,0.07) !important; }
 div[data-baseweb="select"] > div { background: var(--surf) !important; border: 1px solid rgba(255,255,255,0.09) !important; border-radius: 7px !important; }
-.stCheckbox label { background: var(--surf) !important; border: 1px solid var(--bdr) !important; border-radius: 5px !important; padding: 5px 12px !important; font-size: 0.69rem !important; font-weight: 500 !important; color: var(--muted) !important; cursor: pointer !important; transition: border-color 0.15s, color 0.15s !important; white-space: nowrap !important; }
+.stCheckbox label { background: var(--surf) !important; border: 1px solid var(--bdr) !important; border-radius: 5px !important; padding: 5px 12px !important; font-size: 0.69rem !important; font-weight: 500 !important; color: var(--muted) !important; cursor: pointer !important; transition: border-color 0.15s, color 0.15s !important; white-space: nowrap !important; margin-bottom: 8px !important; }
 .stCheckbox label:hover { border-color: rgba(201,169,110,0.35) !important; color: var(--gold2) !important; }
+
+/* CONTENT WRAPPER */
+.content-wrapper { max-width: 1400px; margin: 0 auto; padding: 0 60px; }
+.cta-wrapper { max-width: 1400px; margin: 0 auto; padding: 28px 60px 0; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -430,6 +425,7 @@ PROV_MAP = {
     'SonyLIV':'https://www.sonyliv.com/search?q=',
     'Jio Cinema':'https://www.jiocinema.com/search/',
 }
+
 def prov_href(name, title, fb=''):
     b = PROV_MAP.get(name, '')
     return (b + urllib.parse.quote(title)) if b else (fb or '#')
@@ -525,20 +521,19 @@ if movies_df is not None:
                          if g.strip() not in ('', '(no genres listed)')})
 
 # ─────────────────────────────────────────────────────────────────
-# NAV  — 100% HTML using <a href="?nav=...">
-# No Streamlit buttons, no CSS tricks, always visible
+# NAV — HTML with logo linking to home
 # ─────────────────────────────────────────────────────────────────
 p    = st.session_state.page
 wlc  = len(st.session_state.watchlist)
 badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
 
-def nc(page_id):   # nav link class
+def nc(page_id):
     return "nav-link active" if p == page_id else "nav-link"
 
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="?nav=logo">CineMatch</a>
+    <a class="nav-logo" href="{nav_href('logo')}">CineMatch</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
@@ -557,43 +552,50 @@ if ratings_df is None:
     st.stop()
 
 # ─────────────────────────────────────────────────────────────────
-# CARD GRID RENDERER
-# Pure HTML <a> tags — zero Streamlit buttons anywhere
+# GRID RENDERER — proper spacing with CSS grid
 # ─────────────────────────────────────────────────────────────────
 def render_grid(items, prev_page):
     """items = list of (title, genre1)"""
-    cols = st.columns(8, gap="medium")
-    for i, (title, genre1) in enumerate(items):
+    grid_html = '<div class="movie-grid">'
+    
+    for title, genre1 in items:
         purl  = poster_url(title)
         icon  = GENRE_ICON.get(genre1, '🎬')
         short = title[:17] + '…' if len(title) > 17 else title
         href  = card_href(title, prev_page)
-        img   = (f'<img class="mcard-img" src="{purl}" loading="lazy" alt="{short}" '
+        
+        # Properly escape HTML
+        short_esc = html.escape(short)
+        title_esc = html.escape(title)
+        
+        img   = (f'<img class="mcard-img" src="{purl}" loading="lazy" alt="{short_esc}" '
                  f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
                  f'<div class="mcard-ph" style="display:none;">{icon}</div>'
                  if purl else f'<div class="mcard-ph">{icon}</div>')
-        with cols[i % 8]:
-            st.markdown(f"""
+        
+        grid_html += f"""
 <a class="mc" href="{href}">
   <div class="mcard">
     {img}
     <div class="mcard-ov">
-      <div class="mcard-ov-t">{short}</div>
-      <div class="mcard-ov-s">{genre1}</div>
+      <div class="mcard-ov-t">{short_esc}</div>
+      <div class="mcard-ov-s">{html.escape(genre1)}</div>
     </div>
     <div class="mcard-body">
-      <div class="mcard-title">{short}</div>
-      <div class="mcard-genre">{genre1}</div>
+      <div class="mcard-title">{short_esc}</div>
+      <div class="mcard-genre">{html.escape(genre1)}</div>
     </div>
   </div>
-</a>""", unsafe_allow_html=True)
+</a>"""
+    
+    grid_html += '</div>'
+    st.markdown(grid_html, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
 # DETAIL PAGE
 # ─────────────────────────────────────────────────────────────────
 def show_detail(title):
-    # Back button (only Streamlit button needed here)
-    st.markdown('<div class="det-top">', unsafe_allow_html=True)
+    st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
     st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
     if st.button("← Back", key="back_btn"):
         st.session_state.movie = None
@@ -606,16 +608,15 @@ def show_detail(title):
         st.warning("Could not load details from TMDB.")
         return
 
-    # Plain string values — used directly inside HTML text nodes (no escaping needed;
-    # Streamlit's unsafe_allow_html renders them literally as text content).
-    ptitle   = str(det.get('title', title) or title)
-    overview = str(det.get('overview', '') or '')
-    tagline  = str(det.get('tagline', '') or '')
+    # Safely extract and escape strings
+    ptitle   = html.escape(str(det.get('title', title) or title))
+    overview = html.escape(str(det.get('overview', '') or ''))
+    tagline  = html.escape(str(det.get('tagline', '') or ''))
     year     = str(det.get('release_date', '')[:4])
     rating   = round(det.get('vote_average', 0), 1)
     rt       = det.get('runtime') or 0
     runtime  = f"{rt//60}h {rt%60}m" if rt else ''
-    genres   = [str(g['name']) for g in det.get('genres', [])]
+    genres   = [html.escape(str(g['name'])) for g in det.get('genres', [])]
     poster   = f"{IMG_BASE}/w400{det['poster_path']}"    if det.get('poster_path')   else None
     backdrop = f"{IMG_BASE}/w1280{det['backdrop_path']}" if det.get('backdrop_path') else None
 
@@ -623,18 +624,15 @@ def show_detail(title):
         st.markdown(f'<div class="det-backdrop"><img src="{backdrop}" alt=""/>'
                     f'<div class="det-fade"></div></div>', unsafe_allow_html=True)
 
-    # For HTML attribute (alt=""), use a safe version without quotes
-    alt_title = ptitle.replace('"', '')
-    pimg = (f'<img class="det-poster" src="{poster}" alt="{alt_title}" '
+    pimg = (f'<img class="det-poster" src="{poster}" alt="{ptitle}" '
             f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
             f'<div class="det-poster-ph" style="display:none;">🎬</div>'
             if poster else '<div class="det-poster-ph">🎬</div>')
     gpills = ''.join(f'<span class="det-pill">{g}</span>' for g in genres)
-
-    tagline_html = f'<div class="det-tagline">"{tagline}"</div>' if tagline else ''
+    tagline_html = f'<div class="det-tagline">&quot;{tagline}&quot;</div>' if tagline else ''
 
     st.markdown(f"""
-<div class="det-body">
+<div class="content-wrapper">
   <div class="det-flex">
     {pimg}
     <div class="det-info">
@@ -653,8 +651,8 @@ def show_detail(title):
 
     # Watchlist toggle
     in_wl = title in st.session_state.watchlist
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:8px 80px 16px;'
-                'display:flex;gap:12px;">', unsafe_allow_html=True)
+    st.markdown('<div class="content-wrapper" style="display:flex;gap:12px;padding:8px 0 16px;">', 
+                unsafe_allow_html=True)
     if in_wl:
         st.markdown('<div class="btn-danger">', unsafe_allow_html=True)
         if st.button("✓ In Watchlist — Remove", key="wl_tog"):
@@ -670,8 +668,8 @@ def show_detail(title):
     trailer = next((v for v in videos
                     if v.get('type') == 'Trailer' and v.get('site') == 'YouTube'), None)
     if trailer:
-        st.markdown(f'<div class="sub-sec" style="border-top:none;padding-top:0;padding-bottom:16px;">'
-                    f'<a class="trailer-a" href="https://www.youtube.com/watch?v={trailer["key"]}"'
+        st.markdown(f'<div class="content-wrapper"><a class="trailer-a" '
+                    f'href="https://www.youtube.com/watch?v={trailer["key"]}"'
                     f' target="_blank">▶ Watch Trailer</a></div>', unsafe_allow_html=True)
 
     # Where to Watch
@@ -686,16 +684,17 @@ def show_detail(title):
             if p2['provider_name'] not in seen:
                 seen.add(p2['provider_name']); combp.append((p2, lbl))
 
-    st.markdown('<div class="sub-sec"><div class="sub-h">Where to Watch</div>', unsafe_allow_html=True)
+    st.markdown('<div class="content-wrapper sub-sec">', unsafe_allow_html=True)
+    st.markdown('<div class="sub-h">Where to Watch</div>', unsafe_allow_html=True)
     if combp:
         cards = ''
         for p2, lbl in combp[:10]:
             logo = f'{IMG_BASE}/w92{p2["logo_path"]}' if p2.get('logo_path') else None
-            img  = f'<img src="{logo}" alt="{p2["provider_name"]}"/>' if logo \
+            img  = f'<img src="{logo}" alt="{html.escape(p2["provider_name"])}"/>' if logo \
                    else '<div style="width:40px;height:40px;background:var(--surf2);border-radius:7px;"></div>'
             href = prov_href(p2['provider_name'], ptitle, jtw)
             cards += (f'<a class="prov" href="{href}" target="_blank" rel="noopener">'
-                      f'{img}<div class="prov-n">{p2["provider_name"]}</div>'
+                      f'{img}<div class="prov-n">{html.escape(p2["provider_name"])}</div>'
                       f'<div class="prov-t">{lbl}</div></a>')
         st.markdown(f'<div class="providers">{cards}</div>', unsafe_allow_html=True)
     else:
@@ -708,15 +707,15 @@ def show_detail(title):
     if cast:
         ch = ''
         for c in cast:
-            cname = str(c.get('name', '') or '')
-            cchar = str(c.get('character', '') or '')[:22]
+            cname = html.escape(str(c.get('name', '') or ''))
+            cchar = html.escape(str(c.get('character', '') or '')[:22])
             img = f'{IMG_BASE}/w185{c["profile_path"]}' if c.get('profile_path') else None
             ph  = f'<img class="cast-img" src="{img}" alt=""/>' if img \
                   else '<div class="cast-ph">👤</div>'
             ch += (f'<div class="cast-card">{ph}'
                    f'<div class="cast-name">{cname}</div>'
                    f'<div class="cast-char">{cchar}</div></div>')
-        st.markdown(f'<div class="sub-sec"><div class="sub-h">Cast</div>'
+        st.markdown(f'<div class="content-wrapper sub-sec"><div class="sub-h">Cast</div>'
                     f'<div class="cast-grid">{ch}</div></div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
@@ -742,7 +741,7 @@ if st.session_state.page == 'home':
 </div>""", unsafe_allow_html=True)
 
     # CTA row
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:28px 80px 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="cta-wrapper">', unsafe_allow_html=True)
     ca, cb, _ = st.columns([1.6, 1.8, 8])
     with ca:
         if st.button("Get Recommendations →", key="hero_cta"):
@@ -759,7 +758,8 @@ if st.session_state.page == 'home':
     st.markdown('<div class="divider" style="margin-top:28px;"></div>', unsafe_allow_html=True)
 
     # Browse section
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:32px 80px 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
+    st.markdown('<div style="padding:32px 0 0;">', unsafe_allow_html=True)
     st.markdown('<div class="sec-eye">Explore</div>', unsafe_allow_html=True)
     st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
 
@@ -780,15 +780,12 @@ if st.session_state.page == 'home':
     filtered = pool.head(40)
 
     st.markdown(f'<div class="count">{len(filtered)} TITLES</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:0 80px;">', unsafe_allow_html=True)
-    items = [(row['title'], row['genres'].split('|')[0].strip() if row['genres'] else '')
-             for _, row in filtered.iterrows()]
-    render_grid(items, 'home')
-    st.markdown('</div>', unsafe_allow_html=True)
+    render_grid([(row['title'], row['genres'].split('|')[0].strip() if row['genres'] else '')
+                 for _, row in filtered.iterrows()], 'home')
 
-    # Bottom banner — "Find My Movies" button is inline right of the text
+    # Bottom banner
     st.markdown('<div class="btm"><div class="btm-inner">', unsafe_allow_html=True)
     st.markdown("""
   <div class="btm-text">
@@ -821,21 +818,20 @@ elif st.session_state.page == 'watchlist':
   <p style="font-size:.83rem;">Open any movie and tap "Add to Watchlist".</p>
 </div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f'<div style="max-width:1200px;margin:0 auto;padding:28px 80px 0;">'
+        st.markdown(f'<div class="content-wrapper">'
                     f'<div class="count">{len(wl)} SAVED</div></div>', unsafe_allow_html=True)
-        st.markdown('<div style="max-width:1200px;margin:0 auto;padding:0 80px;">', unsafe_allow_html=True)
         wl_items = []
         for t in wl:
             gr     = movies_df[movies_df['title'] == t]
             genre1 = gr['genres'].values[0].split('|')[0].strip() if len(gr) else ''
             wl_items.append((t, genre1))
         render_grid(wl_items, 'watchlist')
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('<div style="max-width:1200px;margin:0 auto;padding:20px 80px 48px;">', unsafe_allow_html=True)
-        st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
+        
+        st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
+        st.markdown('<div class="btn-ghost" style="margin-top:20px;">', unsafe_allow_html=True)
         if st.button("Clear Watchlist", key="clear_wl"):
             st.session_state.watchlist = []; st.rerun()
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.markdown('</div></div><div style="height:48px;"></div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
 # FOR YOU
@@ -851,7 +847,7 @@ elif st.session_state.page == 'recs':
   </div>
 </div>""", unsafe_allow_html=True)
 
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:40px 80px 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
 
     # Mode toggle
     st.markdown('<div class="sec-eye" style="margin-bottom:16px;">Recommendation Mode</div>',
@@ -947,7 +943,9 @@ elif st.session_state.page == 'recs':
         if recs.empty:
             st.warning("No results found. Try something different.")
         else:
+            st.markdown('</div>', unsafe_allow_html=True)  # close content-wrapper
             st.markdown('<div class="divider" style="margin:32px 0;"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
             st.markdown('<div class="sec-eye">Results</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="sec-h">Top {len(recs)} Picks For You</div>',
                         unsafe_allow_html=True)
@@ -956,7 +954,7 @@ elif st.session_state.page == 'recs':
             with lc:
                 for i, row in recs.iterrows():
                     bw    = int(row['score'] * 100)
-                    pills = ''.join(f'<span class="rec-pill">{g.strip()}</span>'
+                    pills = ''.join(f'<span class="rec-pill">{html.escape(g.strip())}</span>'
                                     for g in row['genres'].split('|') if g.strip())
                     purl  = poster_url(row['title'])
                     g0    = row['genres'].split('|')[0].strip()
@@ -970,14 +968,13 @@ elif st.session_state.page == 'recs':
                     num  = f"0{i+1}" if i+1 < 10 else str(i+1)
                     href = card_href(row['title'], 'recs')
 
-                    # Entire rec card wrapped in <a> — click anywhere opens detail
                     st.markdown(f"""
 <a class="rc" href="{href}">
   <div class="rec-card">
     <div class="rec-num">{num}</div>
     {ph}
     <div class="rec-body">
-      <div class="rec-title">{row['title']}</div>
+      <div class="rec-title">{html.escape(row['title'])}</div>
       <div class="rec-pills">{pills}</div>
       <div class="rec-bar-bg"><div class="rec-bar" style="width:{bw}%;"></div></div>
       <div class="rec-score">Match: {row['score']:.2f}</div>
@@ -1013,4 +1010,6 @@ elif st.session_state.page == 'recs':
                                    "recommendations.csv", "text/csv", key="dl_csv")
                 st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('</div><div style="height:48px;"></div>', unsafe_allow_html=True)
+            st.markdown('</div><div style="height:48px;"></div>', unsafe_allow_html=True)
+    else:
+        st.markdown('</div>', unsafe_allow_html=True)
