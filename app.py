@@ -26,6 +26,9 @@ if "nav" in qp:
     if dest in ("home", "recs", "watchlist"):
         st.session_state["page"]  = dest
         st.session_state["movie"] = None
+    if dest == "logo":
+        st.session_state["page"]  = "home"
+        st.session_state["movie"] = None
     st.query_params.clear()
     st.rerun()
 
@@ -100,9 +103,9 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   border-bottom: 1px solid var(--bdr);
 }
 .nav-inner {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 60px;
+  padding: 0 40px;
   height: 62px;
   display: flex;
   align-items: center;
@@ -233,7 +236,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 65%);
   pointer-events: none;
 }
-.hero-body { max-width: 1280px; margin: 0 auto; padding: 52px 60px 44px; }
+.hero-body { max-width: 1200px; margin: 0 auto; padding: 52px 80px 44px; }
 .hero-eye {
   font-size: 0.58rem; letter-spacing: 4px; text-transform: uppercase;
   color: var(--gold); font-weight: 500; margin-bottom: 14px;
@@ -313,23 +316,24 @@ a.mc:hover .mcard-ov { opacity: 1; }
    BOTTOM BANNER
    Text on left, button on right — same row
 ═══════════════════════════════════════ */
-.btm { background: linear-gradient(120deg, #100e24, #17102a); border-top: 1px solid rgba(201,169,110,0.1); margin-top: 52px; }
+.btm { background: linear-gradient(120deg, #100e24, #17102a); border-top: 1px solid rgba(201,169,110,0.1); margin-top: 52px; border-radius: 0; }
 .btm-inner {
-  max-width: 1280px; margin: 0 auto; padding: 36px 60px;
+  max-width: 1200px; margin: 0 auto; padding: 40px 80px;
   display: flex; align-items: center;
-  justify-content: space-between; gap: 40px; flex-wrap: wrap;
+  justify-content: space-between; gap: 48px; flex-wrap: nowrap;
 }
-.btm-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.25rem; color: #fff; margin-bottom: 6px; }
-.btm-sub { font-size: 0.82rem; color: var(--muted); font-weight: 300; }
+.btm-text { flex: 1; }
+.btm-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.25rem; color: #fff; margin-bottom: 8px; }
+.btm-sub { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
 
 /* ═══════════════════════════════════════
    DETAIL PAGE
 ═══════════════════════════════════════ */
-.det-top  { max-width: 1280px; margin: 0 auto; padding: 22px 60px 0; }
+.det-top  { max-width: 1200px; margin: 0 auto; padding: 22px 80px 0; }
 .det-backdrop { width: 100%; height: 210px; position: relative; overflow: hidden; }
 .det-backdrop img { width: 100%; height: 100%; object-fit: cover; opacity: 0.18; display: block; }
 .det-fade { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 55%); }
-.det-body { max-width: 1280px; margin: 0 auto; padding: 0 60px 56px; }
+.det-body { max-width: 1200px; margin: 0 auto; padding: 0 80px 56px; }
 .det-flex { display: flex; gap: 40px; align-items: flex-start; margin-top: -72px; position: relative; z-index: 2; }
 .det-poster { width: 175px; min-width: 175px; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.88); display: block; }
 .det-poster-ph { width: 175px; min-width: 175px; height: 262px; border-radius: 10px; background: var(--surf2); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; }
@@ -343,7 +347,7 @@ a.mc:hover .mcard-ov { opacity: 1; }
 .det-pill { display: inline-block; background: rgba(255,255,255,0.04); color: #aaa; font-size: 0.67rem; padding: 3px 11px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.07); margin-right: 5px; margin-bottom: 5px; }
 .trailer-a { display: inline-flex; align-items: center; gap: 8px; background: rgba(224,92,92,0.1); color: #ef8080; font-size: 0.73rem; font-weight: 600; padding: 9px 20px; border-radius: 6px; border: 1px solid rgba(224,92,92,0.2); text-decoration: none; }
 .trailer-a:hover { background: rgba(224,92,92,0.18); }
-.sub-sec { max-width: 1280px; margin: 0 auto; padding: 26px 60px; border-top: 1px solid var(--bdr); }
+.sub-sec { max-width: 1200px; margin: 0 auto; padding: 26px 80px; border-top: 1px solid var(--bdr); }
 .sub-h { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 16px; }
 .providers { display: flex; flex-wrap: wrap; gap: 10px; }
 .prov { background: var(--surf); border-radius: 9px; border: 1px solid var(--bdr); padding: 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 84px; text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
@@ -534,7 +538,7 @@ def nc(page_id):   # nav link class
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
+    <a class="nav-logo" href="?nav=logo">CineMatch</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
@@ -558,7 +562,7 @@ if ratings_df is None:
 # ─────────────────────────────────────────────────────────────────
 def render_grid(items, prev_page):
     """items = list of (title, genre1)"""
-    cols = st.columns(8, gap="small")
+    cols = st.columns(8, gap="medium")
     for i, (title, genre1) in enumerate(items):
         purl  = poster_url(title)
         icon  = GENRE_ICON.get(genre1, '🎬')
@@ -602,14 +606,16 @@ def show_detail(title):
         st.warning("Could not load details from TMDB.")
         return
 
-    ptitle   = det.get('title', title)
-    overview = det.get('overview', '')
-    tagline  = det.get('tagline', '')
-    year     = det.get('release_date', '')[:4]
+    # Plain string values — used directly inside HTML text nodes (no escaping needed;
+    # Streamlit's unsafe_allow_html renders them literally as text content).
+    ptitle   = str(det.get('title', title) or title)
+    overview = str(det.get('overview', '') or '')
+    tagline  = str(det.get('tagline', '') or '')
+    year     = str(det.get('release_date', '')[:4])
     rating   = round(det.get('vote_average', 0), 1)
     rt       = det.get('runtime') or 0
     runtime  = f"{rt//60}h {rt%60}m" if rt else ''
-    genres   = [g['name'] for g in det.get('genres', [])]
+    genres   = [str(g['name']) for g in det.get('genres', [])]
     poster   = f"{IMG_BASE}/w400{det['poster_path']}"    if det.get('poster_path')   else None
     backdrop = f"{IMG_BASE}/w1280{det['backdrop_path']}" if det.get('backdrop_path') else None
 
@@ -617,11 +623,15 @@ def show_detail(title):
         st.markdown(f'<div class="det-backdrop"><img src="{backdrop}" alt=""/>'
                     f'<div class="det-fade"></div></div>', unsafe_allow_html=True)
 
-    pimg = (f'<img class="det-poster" src="{poster}" alt="{ptitle}" '
+    # For HTML attribute (alt=""), use a safe version without quotes
+    alt_title = ptitle.replace('"', '')
+    pimg = (f'<img class="det-poster" src="{poster}" alt="{alt_title}" '
             f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
             f'<div class="det-poster-ph" style="display:none;">🎬</div>'
             if poster else '<div class="det-poster-ph">🎬</div>')
     gpills = ''.join(f'<span class="det-pill">{g}</span>' for g in genres)
+
+    tagline_html = f'<div class="det-tagline">"{tagline}"</div>' if tagline else ''
 
     st.markdown(f"""
 <div class="det-body">
@@ -631,10 +641,10 @@ def show_detail(title):
       <div class="det-title">{ptitle}</div>
       <div class="det-meta">
         <span class="det-year">{year}</span>
-        <span class="det-rating">★ {rating} / 10</span>
+        <span class="det-rating">&#9733; {rating} / 10</span>
         <span class="det-rt">{runtime}</span>
       </div>
-      {'<div class="det-tagline">"' + tagline + '"</div>' if tagline else ''}
+      {tagline_html}
       <div class="det-ov">{overview}</div>
       <div>{gpills}</div>
     </div>
@@ -643,7 +653,7 @@ def show_detail(title):
 
     # Watchlist toggle
     in_wl = title in st.session_state.watchlist
-    st.markdown('<div style="max-width:1280px;margin:0 auto;padding:8px 60px 16px;'
+    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:8px 80px 16px;'
                 'display:flex;gap:12px;">', unsafe_allow_html=True)
     if in_wl:
         st.markdown('<div class="btn-danger">', unsafe_allow_html=True)
@@ -698,12 +708,14 @@ def show_detail(title):
     if cast:
         ch = ''
         for c in cast:
+            cname = esc(c.get('name', ''))
+            cchar = esc(c.get('character', '')[:22])
             img = f'{IMG_BASE}/w185{c["profile_path"]}' if c.get('profile_path') else None
-            ph  = f'<img class="cast-img" src="{img}" alt="{c["name"]}"/>' if img \
+            ph  = f'<img class="cast-img" src="{img}" alt="{cname}"/>' if img \
                   else '<div class="cast-ph">👤</div>'
             ch += (f'<div class="cast-card">{ph}'
-                   f'<div class="cast-name">{c["name"]}</div>'
-                   f'<div class="cast-char">{c.get("character","")[:22]}</div></div>')
+                   f'<div class="cast-name">{cname}</div>'
+                   f'<div class="cast-char">{cchar}</div></div>')
         st.markdown(f'<div class="sub-sec"><div class="sub-h">Cast</div>'
                     f'<div class="cast-grid">{ch}</div></div>', unsafe_allow_html=True)
 
@@ -730,7 +742,7 @@ if st.session_state.page == 'home':
 </div>""", unsafe_allow_html=True)
 
     # CTA row
-    st.markdown('<div style="max-width:1280px;margin:0 auto;padding:28px 60px 0;">', unsafe_allow_html=True)
+    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:28px 80px 0;">', unsafe_allow_html=True)
     ca, cb, _ = st.columns([1.6, 1.8, 8])
     with ca:
         if st.button("Get Recommendations →", key="hero_cta"):
@@ -747,7 +759,7 @@ if st.session_state.page == 'home':
     st.markdown('<div class="divider" style="margin-top:28px;"></div>', unsafe_allow_html=True)
 
     # Browse section
-    st.markdown('<div style="max-width:1280px;margin:0 auto;padding:32px 60px 0;">', unsafe_allow_html=True)
+    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:32px 80px 0;">', unsafe_allow_html=True)
     st.markdown('<div class="sec-eye">Explore</div>', unsafe_allow_html=True)
     st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
 
@@ -770,7 +782,7 @@ if st.session_state.page == 'home':
     st.markdown(f'<div class="count">{len(filtered)} TITLES</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div style="max-width:1280px;margin:0 auto;padding:0 60px;">', unsafe_allow_html=True)
+    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:0 80px;">', unsafe_allow_html=True)
     items = [(row['title'], row['genres'].split('|')[0].strip() if row['genres'] else '')
              for _, row in filtered.iterrows()]
     render_grid(items, 'home')
@@ -779,7 +791,7 @@ if st.session_state.page == 'home':
     # Bottom banner — "Find My Movies" button is inline right of the text
     st.markdown('<div class="btm"><div class="btm-inner">', unsafe_allow_html=True)
     st.markdown("""
-  <div>
+  <div class="btm-text">
     <div class="btm-title">Not sure what to watch?</div>
     <div class="btm-sub">Tell us your favourite genres or describe what you're in the mood for.</div>
   </div>""", unsafe_allow_html=True)
@@ -809,9 +821,9 @@ elif st.session_state.page == 'watchlist':
   <p style="font-size:.83rem;">Open any movie and tap "Add to Watchlist".</p>
 </div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f'<div style="max-width:1280px;margin:0 auto;padding:28px 60px 0;">'
+        st.markdown(f'<div style="max-width:1200px;margin:0 auto;padding:28px 80px 0;">'
                     f'<div class="count">{len(wl)} SAVED</div></div>', unsafe_allow_html=True)
-        st.markdown('<div style="max-width:1280px;margin:0 auto;padding:0 60px;">', unsafe_allow_html=True)
+        st.markdown('<div style="max-width:1200px;margin:0 auto;padding:0 80px;">', unsafe_allow_html=True)
         wl_items = []
         for t in wl:
             gr     = movies_df[movies_df['title'] == t]
@@ -819,7 +831,7 @@ elif st.session_state.page == 'watchlist':
             wl_items.append((t, genre1))
         render_grid(wl_items, 'watchlist')
         st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('<div style="max-width:1280px;margin:0 auto;padding:20px 60px 48px;">', unsafe_allow_html=True)
+        st.markdown('<div style="max-width:1200px;margin:0 auto;padding:20px 80px 48px;">', unsafe_allow_html=True)
         st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
         if st.button("Clear Watchlist", key="clear_wl"):
             st.session_state.watchlist = []; st.rerun()
@@ -839,7 +851,7 @@ elif st.session_state.page == 'recs':
   </div>
 </div>""", unsafe_allow_html=True)
 
-    st.markdown('<div style="max-width:1280px;margin:0 auto;padding:40px 60px 0;">', unsafe_allow_html=True)
+    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:40px 80px 0;">', unsafe_allow_html=True)
 
     # Mode toggle
     st.markdown('<div class="sec-eye" style="margin-bottom:16px;">Recommendation Mode</div>',
