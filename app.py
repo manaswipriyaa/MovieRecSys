@@ -708,10 +708,10 @@ def show_detail(title):
     if cast:
         ch = ''
         for c in cast:
-            cname = esc(c.get('name', ''))
-            cchar = esc(c.get('character', '')[:22])
+            cname = str(c.get('name', '') or '')
+            cchar = str(c.get('character', '') or '')[:22]
             img = f'{IMG_BASE}/w185{c["profile_path"]}' if c.get('profile_path') else None
-            ph  = f'<img class="cast-img" src="{img}" alt="{cname}"/>' if img \
+            ph  = f'<img class="cast-img" src="{img}" alt=""/>' if img \
                   else '<div class="cast-ph">👤</div>'
             ch += (f'<div class="cast-card">{ph}'
                    f'<div class="cast-name">{cname}</div>'
