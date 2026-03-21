@@ -1,8 +1,3 @@
-diff --git a/app.py b/app.py
-index 14b77ebc7680dec59f8e8a650aeb7c94a45ab4e5..10b0cdf05cc3d00f99599bf38ae6add1b11c958e 100644
---- a/app.py
-+++ b/app.py
-@@ -1,33 +1,34 @@
  import streamlit as st
  import pandas as pd
  import numpy as np
@@ -11,7 +6,7 @@ index 14b77ebc7680dec59f8e8a650aeb7c94a45ab4e5..10b0cdf05cc3d00f99599bf38ae6add1
  import matplotlib.pyplot as plt
  from sklearn.feature_extraction.text import TfidfVectorizer
  from sklearn.metrics.pairwise import cosine_similarity
-+import html
+ import html
  import os, re, requests, urllib.parse
  
  st.set_page_config(page_title="CineMatch", layout="wide", initial_sidebar_state="collapsed")
