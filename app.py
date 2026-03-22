@@ -82,6 +82,14 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   font-size:0.55rem; font-weight:700; border-radius:8px;
   padding:1px 7px; margin-left:5px; vertical-align:middle;
 }
+.nav-cta {
+  background:var(--gold); color:#08090e !important;
+  font-family:'Outfit',sans-serif; font-size:0.7rem; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase; text-decoration:none;
+  padding:8px 20px; border-radius:6px; white-space:nowrap; flex-shrink:0;
+  transition:opacity .15s;
+}
+.nav-cta:hover { opacity:0.85; }
 
 /* HERO */
 .hero {
@@ -342,6 +350,8 @@ st.markdown(f"""
       <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
       <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
     </nav>
+    <div style="flex:1;"></div>
+    <a class="nav-cta" href="{nav_href('recs')}">Get Recommendations</a>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -505,26 +515,18 @@ if st.session_state.movie:
 # ─────────────────────────────────────────────────────────────────
 if st.session_state.page == 'home':
 
-    # Hero: text on left, button on right — same purple dashboard
     st.markdown('<div class="hero">', unsafe_allow_html=True)
     with C():
-        hero_left, hero_right = st.columns([2.2, 1])
-        with hero_left:
-            st.markdown("""
+        st.markdown("""
 <div class="hero-body">
   <div class="hero-eye">AI-Powered Discovery</div>
   <div class="hero-h">Your next favourite<br><em>film</em> awaits.</div>
   <div class="hero-p">Browse thousands of movies or let our engine recommend
   films tailored to your taste — no account needed.</div>
 </div>""", unsafe_allow_html=True)
-        with hero_right:
-            st.markdown('<div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-top:80px;gap:12px;">', unsafe_allow_html=True)
-            if st.button("Get Recommendations →", key="hero_cta"):
-                st.session_state.page='recs'; st.rerun()
-            if st.session_state.watchlist:
-                if st.button(f"🎯 My Watchlist ({wlc})", key="wl_hero"):
-                    st.session_state.page='watchlist'; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+        if st.session_state.watchlist:
+            if st.button(f"🎯 My Watchlist ({wlc})", key="wl_hero"):
+                st.session_state.page='watchlist'; st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
