@@ -505,34 +505,34 @@ if st.session_state.movie:
 # ─────────────────────────────────────────────────────────────────
 if st.session_state.page == 'home':
 
+    # Hero: text on left, button on right — same purple dashboard
     st.markdown('<div class="hero">', unsafe_allow_html=True)
     with C():
-        st.markdown("""
+        hero_left, hero_right = st.columns([2.2, 1])
+        with hero_left:
+            st.markdown("""
 <div class="hero-body">
   <div class="hero-eye">AI-Powered Discovery</div>
   <div class="hero-h">Your next favourite<br><em>film</em> awaits.</div>
   <div class="hero-p">Browse thousands of movies or let our engine recommend
   films tailored to your taste — no account needed.</div>
 </div>""", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div style="height:28px;"></div>', unsafe_allow_html=True)
-    with C():
-        ca, cb, _ = st.columns([1.8, 2, 8])
-        with ca:
+        with hero_right:
+            st.markdown('<div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-top:52px;gap:12px;">', unsafe_allow_html=True)
             if st.button("Get Recommendations →", key="hero_cta"):
                 st.session_state.page='recs'; st.rerun()
-        with cb:
             if st.session_state.watchlist:
                 if st.button(f"🎯 My Watchlist ({wlc})", key="wl_hero"):
                     st.session_state.page='watchlist'; st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div style="height:28px;"></div>', unsafe_allow_html=True)
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div style="height:32px;"></div>', unsafe_allow_html=True)
 
     with C():
-        st.markdown('<div class="sec-eye">Explore</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-eye" style="margin-bottom:6px;">Explore</div>', unsafe_allow_html=True)
+        st.markdown('<div style="height:6px;"></div>', unsafe_allow_html=True)
         st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
         f1, f2 = st.columns([3, 1])
         with f1:
