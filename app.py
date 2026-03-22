@@ -518,7 +518,7 @@ if st.session_state.page == 'home':
   films tailored to your taste — no account needed.</div>
 </div>""", unsafe_allow_html=True)
         with hero_right:
-            st.markdown('<div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-top:52px;gap:12px;">', unsafe_allow_html=True)
+            st.markdown('<div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding-top:80px;gap:12px;">', unsafe_allow_html=True)
             if st.button("Get Recommendations →", key="hero_cta"):
                 st.session_state.page='recs'; st.rerun()
             if st.session_state.watchlist:
