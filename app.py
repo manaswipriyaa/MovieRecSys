@@ -173,6 +173,14 @@ div[data-testid="stSidebar"], footer, header { display: none !important; }
   margin-left: 5px;
   vertical-align: middle;
 }
+.nav-cta {
+  background: var(--gold); color: #08090e !important;
+  font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none !important;
+  padding: 8px 20px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  transition: opacity .15s;
+}
+.nav-cta:hover { opacity: 0.85; }
 
 /* ═══════════════════════════════════════
    STREAMLIT BUTTONS (action only, no nav)
@@ -550,13 +558,15 @@ def nc(page_id):   # nav link class
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="?nav=logo">CineMatch</a>
+    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
       <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
       <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
     </nav>
+    <div style="flex:1;"></div>
+    <a class="nav-cta" href="{nav_href('recs')}">Get Recommendations</a>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -742,36 +752,25 @@ if st.session_state.movie:
 # ─────────────────────────────────────────────────────────────────
 if st.session_state.page == 'home':
 
-    st.markdown("""
-<div class="hero">
-  <div class="hero-body">
-    <div class="hero-eye">AI-Powered Discovery</div>
-    <div class="hero-h">Your next favourite<br><em>film</em> awaits.</div>
-    <div class="hero-p">Browse thousands of movies or let our engine recommend
-    films tailored to your taste — no account needed.</div>
-  </div>
+    st.markdown('<div class="hero">', unsafe_allow_html=True)
+    with C():
+        st.markdown("""
+<div class="hero-body">
+  <div class="hero-eye">AI-Powered Discovery</div>
+  <div class="hero-h">Your next favourite<br><em>film</em> awaits.</div>
+  <div class="hero-p">Browse thousands of movies or let our engine recommend
+  films tailored to your taste — no account needed.</div>
 </div>""", unsafe_allow_html=True)
-
-    # CTA row
-    st.markdown('<div class="W" style="padding-top:28px;">', unsafe_allow_html=True)
-    ca, cb, _ = st.columns([1.6, 1.8, 8])
-    with ca:
-        if st.button("Get Recommendations →", key="hero_cta"):
-            st.session_state.page = 'recs'; st.rerun()
-    with cb:
         if st.session_state.watchlist:
-            st.markdown('<div style="border:1px solid rgba(201,169,110,0.28);border-radius:6px;display:inline-block;">',
-                        unsafe_allow_html=True)
-            if st.button(f"🎯  My Watchlist  ({wlc})", key="wl_hero"):
+            if st.button(f"🎯 My Watchlist ({wlc})", key="wl_hero"):
                 st.session_state.page = 'watchlist'; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="divider" style="margin-top:28px;"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
     # Browse section
     st.markdown('<div class="W" style="padding-top:32px;">', unsafe_allow_html=True)
-    st.markdown('<div class="sec-eye">Explore</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-eye" style="margin-bottom:10px;">Explore</div>', unsafe_allow_html=True)
     st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
 
     f1, f2 = st.columns([3, 1])
@@ -799,16 +798,7 @@ if st.session_state.page == 'home':
     render_grid(items, 'home')
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Bottom banner — "Find My Movies" button is inline right of the text
-    st.markdown('<div class="btm"><div class="btm-inner">', unsafe_allow_html=True)
-    st.markdown("""
-  <div class="btm-text">
-    <div class="btm-title">Not sure what to watch?</div>
-    <div class="btm-sub">Tell us your favourite genres or describe what you're in the mood for.</div>
-  </div>""", unsafe_allow_html=True)
-    if st.button("Find My Movies →", key="banner_cta"):
-        st.session_state.page = 'recs'; st.rerun()
-    st.markdown('</div></div><div style="height:48px;"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
 # WATCHLIST
@@ -864,7 +854,7 @@ elif st.session_state.page == 'recs':
     st.markdown('<div class="W" style="padding-top:40px;">', unsafe_allow_html=True)
 
     # Mode toggle
-    st.markdown('<div class="sec-eye" style="margin-bottom:16px;">Recommendation Mode</div>',
+    st.markdown('<div class="sec-eye" style="margin-bottom:20px;">Recommendation Mode</div>',
                 unsafe_allow_html=True)
     mc1, mc2, _sp = st.columns([1.4, 1.6, 9])
     with mc1:
