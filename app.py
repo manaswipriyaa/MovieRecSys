@@ -76,6 +76,8 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   white-space:nowrap; transition:color .15s, background .15s;
 }
 .nav-link:hover { color:var(--gold); background:rgba(201,169,110,0.07); }
+.nav a, .nav-logo, .nav-link, .nav-cta { text-decoration:none !important; }
+.nav a:hover, .nav-logo:hover, .nav-link:hover, .nav-cta:hover { text-decoration:none !important; }
 .nav-link.active { color:var(--gold2); }
 .nav-badge {
   display:inline-block; background:var(--gold); color:#08090e;
@@ -533,8 +535,7 @@ if st.session_state.page == 'home':
     st.markdown('<div style="height:32px;"></div>', unsafe_allow_html=True)
 
     with C():
-        st.markdown('<div class="sec-eye" style="margin-bottom:6px;">Explore</div>', unsafe_allow_html=True)
-        st.markdown('<div style="height:6px;"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-eye" style="margin-bottom:10px;">Explore</div>', unsafe_allow_html=True)
         st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
         f1, f2 = st.columns([3, 1])
         with f1:
