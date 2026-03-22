@@ -178,7 +178,7 @@ a.mc:hover .mcard-ov { opacity:1; }
 .det-flex { display:flex; gap:40px; align-items:flex-start; margin-top:-72px; position:relative; z-index:2; }
 .det-poster { width:175px; min-width:175px; border-radius:10px; box-shadow:0 24px 60px rgba(0,0,0,.88); display:block; }
 .det-poster-ph { width:175px; min-width:175px; height:262px; border-radius:10px; background:var(--surf2); display:flex; align-items:center; justify-content:center; font-size:2.8rem; }
-.det-info { flex:1; padding-top:80px; }
+.det-info { flex:1; padding-top:0; }
 .det-title { font-family:'Playfair Display',serif; font-weight:900; font-size:clamp(1.5rem,3vw,2.5rem); color:#fff; line-height:1.08; margin-bottom:12px; }
 .det-meta { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:13px; }
 .det-rating { background:rgba(201,169,110,.12); color:var(--gold2); font-size:.73rem; font-weight:600; padding:3px 12px; border-radius:5px; border:1px solid rgba(201,169,110,.22); }
@@ -418,32 +418,35 @@ def show_detail(title):
     tagline_html = f'<div class="det-tagline">"{tagline}"</div>' if tagline else ''
 
     with C():
-        st.markdown(f"""
-<div class="det-flex">
-  {pimg}
-  <div class="det-info">
-    <div class="det-title">{ptitle}</div>
-    <div class="det-meta">
-      <span class="det-year">{year}</span>
-      <span class="det-rating">&#9733; {rating} / 10</span>
-      <span class="det-rt">{runtime}</span>
-    </div>
-    {tagline_html}
-    <div class="det-ov">{overview}</div>
-    <div>{gpills}</div>
+        # Split into two columns: poster on left, all info + watchlist button on right
+        poster_col, info_col = st.columns([1, 2.8])
+
+        with poster_col:
+            st.markdown(pimg, unsafe_allow_html=True)
+
+        with info_col:
+            st.markdown(f"""
+<div class="det-info" style="padding-top:0;">
+  <div class="det-title">{ptitle}</div>
+  <div class="det-meta">
+    <span class="det-year">{year}</span>
+    <span class="det-rating">&#9733; {rating} / 10</span>
+    <span class="det-rt">{runtime}</span>
   </div>
+  {tagline_html}
+  <div class="det-ov">{overview}</div>
+  <div style="margin-bottom:18px;">{gpills}</div>
 </div>""", unsafe_allow_html=True)
 
-        st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
-        in_wl = title in st.session_state.watchlist
-        if in_wl:
-            st.markdown('<div class="btn-danger">', unsafe_allow_html=True)
-            if st.button("✓ In Watchlist — Remove", key="wl_tog"):
-                st.session_state.watchlist.remove(title); st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            if st.button("＋ Add to Watchlist", key="wl_tog"):
-                st.session_state.watchlist.append(title); st.rerun()
+            in_wl = title in st.session_state.watchlist
+            if in_wl:
+                st.markdown('<div class="btn-danger">', unsafe_allow_html=True)
+                if st.button("✓ In Watchlist — Remove", key="wl_tog"):
+                    st.session_state.watchlist.remove(title); st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                if st.button("＋ Add to Watchlist", key="wl_tog"):
+                    st.session_state.watchlist.append(title); st.rerun()
 
         # Trailer
         videos  = det.get('videos',{}).get('results',[])
