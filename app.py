@@ -10,24 +10,24 @@ import os, re, requests, urllib.parse
 
 st.set_page_config(page_title="CineMatch", layout="wide", initial_sidebar_state="collapsed")
 
-# ── query-param router ────────────────────────────────────────────
-qp = st.query_params.to_dict()
-if "movie" in qp:
-    st.session_state["movie"] = urllib.parse.unquote(qp["movie"])
-    st.session_state["prev"]  = qp.get("prev", "home")
-    st.query_params.clear(); st.rerun()
-if "nav" in qp:
-    dest = qp["nav"]
-    st.session_state["page"]  = "home" if dest == "logo" else (dest if dest in ("home","recs","watchlist") else "home")
-    st.session_state["movie"] = None
-    st.query_params.clear(); st.rerun()
-
+# ── session defaults ──────────────────────────────────────────────
 for k, v in {"page":"home","prev":"home","movie":None,"genres":[],
              "recs":None,"watchlist":[],"rec_mode":"genre","search_q":""}.items():
-    if k not in st.session_state: st.session_state[k] = v
+    if k not in st.session_state:
+        st.session_state[k] = v
+
+def go(page):
+    st.session_state.page  = page
+    st.session_state.movie = None
+    st.rerun()
+
+def open_movie(title, prev):
+    st.session_state.movie = title
+    st.session_state.prev  = prev
+    st.rerun()
 
 # ─────────────────────────────────────────────────────────────────
-# CSS — visual styles only, NO layout padding (done via st.columns)
+# CSS
 # ─────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -51,49 +51,178 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
 ::-webkit-scrollbar-track { background:var(--bg); }
 ::-webkit-scrollbar-thumb { background:var(--subtle); border-radius:3px; }
 
-/* NAV */
-.nav {
+/* ── NAV SHELL ── */
+.nav-shell {
   position:sticky; top:0; z-index:9999;
   background:rgba(8,9,14,0.97);
   backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
   border-bottom:1px solid var(--bdr);
+  height:62px;
 }
-.nav-inner {
-  padding:0 48px; height:62px;
-  display:flex; align-items:center; gap:0;
-}
-.nav-logo {
+.nav-logo-txt {
   font-family:'Playfair Display',serif; font-weight:900;
   font-size:1.05rem; letter-spacing:5px; text-transform:uppercase;
-  color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
-  text-decoration:none;
+  color:var(--gold); white-space:nowrap;
 }
-.nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
-.nav-links { display:flex; align-items:center; gap:2px; }
-.nav-link {
-  font-size:0.7rem; font-weight:500; letter-spacing:2px; text-transform:uppercase;
-  color:var(--muted); text-decoration:none; padding:8px 18px; border-radius:5px;
-  white-space:nowrap; transition:color .15s, background .15s;
-}
-.nav-link:hover { color:var(--gold); background:rgba(201,169,110,0.07); }
-.nav a, .nav-logo, .nav-link, .nav-cta { text-decoration:none !important; }
-.nav a:hover, .nav-logo:hover, .nav-link:hover, .nav-cta:hover { text-decoration:none !important; }
-.nav-link.active { color:var(--gold2); }
+.nav-sep { width:1px; height:18px; background:var(--bdr); margin:0 8px; flex-shrink:0; }
 .nav-badge {
   display:inline-block; background:var(--gold); color:#08090e;
   font-size:0.55rem; font-weight:700; border-radius:8px;
   padding:1px 7px; margin-left:5px; vertical-align:middle;
 }
-.nav-cta {
-  background:var(--gold); color:#08090e !important;
-  font-family:'Outfit',sans-serif; font-size:0.7rem; font-weight:700;
-  letter-spacing:1.5px; text-transform:uppercase; text-decoration:none;
-  padding:8px 20px; border-radius:6px; white-space:nowrap; flex-shrink:0;
-  transition:opacity .15s;
-}
-.nav-cta:hover { opacity:0.85; }
 
-/* HERO */
+/* Nav Streamlit buttons */
+.nav-btn .stButton > button {
+  background:transparent !important; color:var(--muted) !important;
+  border:none !important; box-shadow:none !important;
+  font-family:'Outfit',sans-serif !important;
+  font-size:0.68rem !important; font-weight:500 !important;
+  letter-spacing:2px !important; text-transform:uppercase !important;
+  padding:8px 16px !important; border-radius:5px !important;
+  width:auto !important; min-width:0 !important; white-space:nowrap !important;
+  transition:color .15s, background .15s !important; transform:none !important;
+}
+.nav-btn .stButton > button:hover {
+  color:var(--gold) !important;
+  background:rgba(201,169,110,0.07) !important;
+  transform:none !important;
+}
+.nav-btn-active .stButton > button { color:var(--gold2) !important; }
+
+/* Nav logo button */
+.nav-logo-btn .stButton > button {
+  background:transparent !important; border:none !important; box-shadow:none !important;
+  font-family:'Playfair Display',serif !important; font-weight:900 !important;
+  font-size:1.05rem !important; letter-spacing:5px !important;
+  text-transform:uppercase !important; color:var(--gold) !important;
+  padding:0 !important; width:auto !important; min-width:0 !important;
+  white-space:nowrap !important; transform:none !important;
+}
+.nav-logo-btn .stButton > button:hover { opacity:0.85 !important; transform:none !important; }
+
+/* Nav CTA button */
+.nav-cta-btn .stButton > button {
+  background:var(--gold) !important; color:#08090e !important;
+  border:none !important; border-radius:6px !important;
+  font-family:'Outfit',sans-serif !important;
+  font-size:0.68rem !important; font-weight:700 !important;
+  letter-spacing:1.5px !important; text-transform:uppercase !important;
+  padding:8px 20px !important; white-space:nowrap !important;
+  box-shadow:0 4px 14px rgba(201,169,110,0.25) !important;
+  width:auto !important; min-width:0 !important; transform:none !important;
+}
+.nav-cta-btn .stButton > button:hover { opacity:0.85 !important; transform:none !important; }
+
+/* ── GLOBAL BUTTONS ── */
+.stButton > button {
+  background:var(--gold) !important; color:#08090e !important;
+  border:none !important; border-radius:6px !important;
+  font-family:'Outfit',sans-serif !important; font-size:.72rem !important;
+  font-weight:600 !important; letter-spacing:1.5px !important;
+  text-transform:uppercase !important; padding:10px 26px !important;
+  box-shadow:0 4px 16px rgba(201,169,110,.2) !important;
+  width:auto !important; min-width:0 !important; white-space:nowrap !important;
+  transition:opacity .15s !important; transform:none !important;
+}
+.stButton > button:hover { opacity:.85 !important; transform:none !important; }
+
+.btn-ghost .stButton > button {
+  background:transparent !important; color:var(--muted) !important;
+  border:1px solid rgba(255,255,255,.13) !important; box-shadow:none !important;
+  text-transform:none !important; letter-spacing:1px !important;
+  font-size:.72rem !important; padding:9px 22px !important;
+}
+.btn-ghost .stButton > button:hover { color:var(--txt) !important; border-color:rgba(255,255,255,.28) !important; }
+
+.btn-danger .stButton > button {
+  background:transparent !important; color:#e05c5c !important;
+  border:1px solid rgba(224,92,92,.28) !important; box-shadow:none !important;
+  font-size:.72rem !important; padding:9px 22px !important;
+  text-transform:none !important; letter-spacing:.5px !important;
+}
+
+.stDownloadButton > button {
+  background:transparent !important; color:var(--muted) !important;
+  border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important;
+  font-size:.7rem !important; padding:8px 18px !important;
+}
+
+/* ── MOVIE CARD ──
+   The card is pure display HTML.
+   The Streamlit button is absolutely positioned over it — fully invisible.
+   Clicking anywhere on the poster fires the button → session state → rerun.
+*/
+.card-wrap { position:relative; }
+.card-wrap .stButton { position:absolute !important; inset:0 !important; z-index:2 !important; }
+.card-wrap .stButton > button {
+  position:absolute !important; inset:0 !important;
+  width:100% !important; height:100% !important;
+  background:transparent !important; border:none !important;
+  box-shadow:none !important; color:transparent !important;
+  font-size:0 !important; padding:0 !important;
+  cursor:pointer !important; border-radius:8px !important;
+  transform:none !important; letter-spacing:0 !important;
+  text-transform:none !important; opacity:0 !important;
+}
+.card-wrap .stButton > button:hover {
+  background:transparent !important; opacity:0 !important; transform:none !important;
+}
+.mcard {
+  border-radius:8px; overflow:hidden; background:var(--surf); border:1px solid var(--bdr);
+  transition:transform .22s cubic-bezier(.22,.68,0,1.2), box-shadow .22s, border-color .2s;
+  position:relative; cursor:pointer;
+}
+.card-wrap:hover .mcard {
+  transform:translateY(-7px) scale(1.012);
+  box-shadow:0 20px 50px rgba(0,0,0,.8), 0 0 0 1px rgba(201,169,110,.22);
+  border-color:rgba(201,169,110,.3);
+}
+.mcard-img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
+.mcard-ph { width:100%; aspect-ratio:2/3; background:linear-gradient(160deg,var(--surf),var(--surf2)); display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--muted); }
+.mcard-ov {
+  position:absolute; inset:0;
+  background:linear-gradient(to top,rgba(8,9,14,.97) 0%,rgba(8,9,14,.4) 36%,transparent 66%);
+  opacity:0; transition:opacity .22s;
+  display:flex; flex-direction:column; justify-content:flex-end; padding:12px 10px 11px;
+}
+.card-wrap:hover .mcard-ov { opacity:1; }
+.mcard-ov-t { font-family:'Playfair Display',serif; font-size:.73rem; font-weight:700; color:#fff; line-height:1.2; margin-bottom:2px; }
+.mcard-ov-s { font-size:.59rem; color:var(--gold); }
+.mcard-body { padding:9px 10px 10px; }
+.mcard-title { font-size:.71rem; font-weight:500; color:#c0c0d8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+.mcard-genre { font-size:.59rem; color:var(--muted); }
+
+/* ── REC CARD (same invisible-button approach) ── */
+.rec-wrap { position:relative; margin-bottom:10px; }
+.rec-wrap .stButton { position:absolute !important; inset:0 !important; z-index:2 !important; }
+.rec-wrap .stButton > button {
+  position:absolute !important; inset:0 !important;
+  width:100% !important; height:100% !important;
+  background:transparent !important; border:none !important;
+  box-shadow:none !important; color:transparent !important;
+  font-size:0 !important; padding:0 !important;
+  cursor:pointer !important; border-radius:10px !important;
+  transform:none !important; letter-spacing:0 !important;
+  text-transform:none !important; opacity:0 !important;
+}
+.rec-wrap .stButton > button:hover {
+  background:transparent !important; opacity:0 !important; transform:none !important;
+}
+.rec-card { background:var(--surf); border-radius:10px; border:1px solid var(--bdr); padding:16px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color .18s, transform .18s, box-shadow .18s; cursor:pointer; }
+.rec-wrap:hover .rec-card { border-color:rgba(201,169,110,.28); transform:translateX(3px); box-shadow:0 4px 22px rgba(0,0,0,.4); }
+.rec-num { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:900; color:rgba(201,169,110,.13); min-width:34px; line-height:1; text-align:right; flex-shrink:0; }
+.rec-poster { width:50px; height:75px; border-radius:6px; object-fit:cover; flex-shrink:0; }
+.rec-poster-ph { width:50px; height:75px; border-radius:6px; background:var(--surf2); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+.rec-body { flex:1; min-width:0; }
+.rec-title { font-size:.86rem; font-weight:600; color:var(--txt); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rec-pills { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:8px; }
+.rec-pill { background:var(--gdim); color:var(--gold2); font-size:.59rem; padding:2px 7px; border-radius:3px; border:1px solid rgba(201,169,110,.14); font-weight:500; }
+.rec-bar-bg { height:2px; background:var(--subtle); border-radius:2px; margin-bottom:4px; }
+.rec-bar { height:2px; background:linear-gradient(90deg,var(--gold),var(--gold2)); border-radius:2px; }
+.rec-score { font-size:.64rem; color:var(--gold); font-weight:500; }
+.rec-hint { font-size:.6rem; color:var(--muted); margin-top:3px; }
+
+/* ── HERO ── */
 .hero {
   background:linear-gradient(155deg,#0c0b1c 0%,#0f0c1f 55%,#080912 100%);
   border-bottom:1px solid var(--bdr); position:relative; overflow:hidden;
@@ -109,82 +238,15 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
 .hero-h em { font-style:italic; color:var(--gold); }
 .hero-p { font-size:.88rem; color:var(--muted); line-height:1.75; max-width:420px; font-weight:300; }
 
-/* BUTTONS */
-.stButton > button {
-  background:var(--gold) !important; color:#08090e !important;
-  border:none !important; border-radius:6px !important;
-  font-family:'Outfit',sans-serif !important; font-size:.72rem !important;
-  font-weight:600 !important; letter-spacing:1.5px !important;
-  text-transform:uppercase !important; padding:10px 26px !important;
-  box-shadow:0 4px 16px rgba(201,169,110,.2) !important;
-  width:auto !important; min-width:0 !important; white-space:nowrap !important;
-  transition:opacity .15s !important; transform:none !important;
-}
-.stButton > button:hover { opacity:.85 !important; transform:none !important; }
-.btn-ghost .stButton > button {
-  background:transparent !important; color:var(--muted) !important;
-  border:1px solid rgba(255,255,255,.13) !important; box-shadow:none !important;
-  text-transform:none !important; letter-spacing:1px !important;
-  font-size:.72rem !important; padding:9px 22px !important;
-}
-.btn-ghost .stButton > button:hover { color:var(--txt) !important; border-color:rgba(255,255,255,.28) !important; }
-.btn-danger .stButton > button {
-  background:transparent !important; color:#e05c5c !important;
-  border:1px solid rgba(224,92,92,.28) !important; box-shadow:none !important;
-  font-size:.72rem !important; padding:9px 22px !important;
-  text-transform:none !important; letter-spacing:.5px !important;
-}
-.stDownloadButton > button {
-  background:transparent !important; color:var(--muted) !important;
-  border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important;
-  font-size:.7rem !important; padding:8px 18px !important;
-}
-
-/* DIVIDER */
 .divider { height:1px; background:var(--bdr); }
-
-/* SECTION LABELS */
-.sec-eye { font-size:.58rem; letter-spacing:3.5px; text-transform:uppercase; color:var(--muted); font-weight:500; margin-bottom:5px; }
+.sec-eye { font-size:.58rem; letter-spacing:3.5px; text-transform:uppercase; color:var(--muted); font-weight:500; }
 .sec-h { font-family:'Playfair Display',serif; font-weight:700; font-size:1.22rem; color:#fff; margin-bottom:22px; letter-spacing:-.3px; }
 .count { font-size:.6rem; color:var(--muted); letter-spacing:2px; font-weight:500; margin:14px 0 18px; }
 
-/* MOVIE CARD */
-a.mc { display:block; text-decoration:none; color:inherit; }
-.mcard {
-  border-radius:8px; overflow:hidden; background:var(--surf); border:1px solid var(--bdr);
-  transition:transform .22s cubic-bezier(.22,.68,0,1.2), box-shadow .22s, border-color .2s;
-  position:relative; cursor:pointer;
-}
-a.mc:hover .mcard {
-  transform:translateY(-7px) scale(1.012);
-  box-shadow:0 20px 50px rgba(0,0,0,.8), 0 0 0 1px rgba(201,169,110,.22);
-  border-color:rgba(201,169,110,.3);
-}
-.mcard-img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
-.mcard-ph { width:100%; aspect-ratio:2/3; background:linear-gradient(160deg,var(--surf),var(--surf2)); display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--muted); }
-.mcard-ov {
-  position:absolute; inset:0;
-  background:linear-gradient(to top,rgba(8,9,14,.97) 0%,rgba(8,9,14,.4) 36%,transparent 66%);
-  opacity:0; transition:opacity .22s;
-  display:flex; flex-direction:column; justify-content:flex-end; padding:12px 10px 11px;
-}
-a.mc:hover .mcard-ov { opacity:1; }
-.mcard-ov-t { font-family:'Playfair Display',serif; font-size:.73rem; font-weight:700; color:#fff; line-height:1.2; margin-bottom:2px; }
-.mcard-ov-s { font-size:.59rem; color:var(--gold); }
-.mcard-body { padding:9px 10px 10px; }
-.mcard-title { font-size:.71rem; font-weight:500; color:#c0c0d8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-.mcard-genre { font-size:.59rem; color:var(--muted); }
-
-/* BOTTOM BANNER */
-
-
-/* DETAIL */
+/* ── DETAIL ── */
 .det-backdrop { width:100%; height:210px; position:relative; overflow:hidden; }
 .det-backdrop img { width:100%; height:100%; object-fit:cover; opacity:.18; display:block; }
 .det-fade { position:absolute; inset:0; background:linear-gradient(to top,var(--bg) 0%,transparent 55%); }
-.det-flex { display:flex; gap:40px; align-items:flex-start; margin-top:-72px; position:relative; z-index:2; }
-.det-poster { width:175px; min-width:175px; border-radius:10px; box-shadow:0 24px 60px rgba(0,0,0,.88); display:block; }
-.det-poster-ph { width:175px; min-width:175px; height:262px; border-radius:10px; background:var(--surf2); display:flex; align-items:center; justify-content:center; font-size:2.8rem; }
 .det-info { flex:1; padding-top:0; }
 .det-title { font-family:'Playfair Display',serif; font-weight:900; font-size:clamp(1.5rem,3vw,2.5rem); color:#fff; line-height:1.08; margin-bottom:12px; }
 .det-meta { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:13px; }
@@ -196,7 +258,7 @@ a.mc:hover .mcard-ov { opacity:1; }
 .trailer-a { display:inline-flex; align-items:center; gap:8px; background:rgba(224,92,92,.1); color:#ef8080; font-size:.73rem; font-weight:600; padding:9px 20px; border-radius:6px; border:1px solid rgba(224,92,92,.2); text-decoration:none; }
 .trailer-a:hover { background:rgba(224,92,92,.18); }
 .sub-h { font-family:'Playfair Display',serif; font-weight:700; font-size:.95rem; color:#fff; margin-bottom:16px; margin-top:28px; }
-.sub-divider { height:1px; background:var(--bdr); margin:0 0 26px 0; }
+.sub-divider { height:1px; background:var(--bdr); margin-top:28px; }
 .providers { display:flex; flex-wrap:wrap; gap:10px; }
 .prov { background:var(--surf); border-radius:9px; border:1px solid var(--bdr); padding:12px 14px; display:flex; flex-direction:column; align-items:center; gap:5px; min-width:84px; text-decoration:none; transition:border-color .15s, transform .15s; }
 .prov:hover { border-color:rgba(201,169,110,.32); transform:translateY(-2px); }
@@ -211,29 +273,15 @@ a.mc:hover .mcard-ov { opacity:1; }
 .cast-name { font-size:.63rem; font-weight:600; color:#bbb; padding:5px 6px 2px; }
 .cast-char { font-size:.56rem; color:var(--muted); padding:0 6px 7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* REC CARDS */
-a.rc { display:block; text-decoration:none; color:inherit; margin-bottom:10px; }
-.rec-card { background:var(--surf); border-radius:10px; border:1px solid var(--bdr); padding:16px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color .18s, transform .18s, box-shadow .18s; cursor:pointer; }
-a.rc:hover .rec-card { border-color:rgba(201,169,110,.28); transform:translateX(3px); box-shadow:0 4px 22px rgba(0,0,0,.4); }
-.rec-num { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:900; color:rgba(201,169,110,.13); min-width:34px; line-height:1; text-align:right; flex-shrink:0; }
-.rec-poster { width:50px; height:75px; border-radius:6px; object-fit:cover; flex-shrink:0; }
-.rec-poster-ph { width:50px; height:75px; border-radius:6px; background:var(--surf2); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
-.rec-body { flex:1; min-width:0; }
-.rec-title { font-size:.86rem; font-weight:600; color:var(--txt); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.rec-pills { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:8px; }
-.rec-pill { background:var(--gdim); color:var(--gold2); font-size:.59rem; padding:2px 7px; border-radius:3px; border:1px solid rgba(201,169,110,.14); font-weight:500; }
-.rec-bar-bg { height:2px; background:var(--subtle); border-radius:2px; margin-bottom:4px; }
-.rec-bar { height:2px; background:linear-gradient(90deg,var(--gold),var(--gold2)); border-radius:2px; }
-.rec-score { font-size:.64rem; color:var(--gold); font-weight:500; }
-.rec-hint { font-size:.6rem; color:var(--muted); margin-top:3px; }
-.chart-panel { background:var(--surf); border:1px solid var(--bdr); border-radius:10px; padding:20px; }
-
-/* WATCHLIST EMPTY */
+/* ── WATCHLIST EMPTY ── */
 .wl-empty { text-align:center; padding:72px 40px; color:var(--muted); }
 .wl-empty-icon { font-size:2.8rem; margin-bottom:14px; }
 .wl-empty-h { font-family:'Playfair Display',serif; font-size:1.2rem; color:#fff; margin-bottom:8px; }
 
-/* INPUTS */
+/* ── CHART ── */
+.chart-panel { background:var(--surf); border:1px solid var(--bdr); border-radius:10px; padding:20px; }
+
+/* ── INPUTS ── */
 .stTextInput input { background:var(--surf) !important; color:var(--txt) !important; border:1px solid rgba(255,255,255,.09) !important; border-radius:7px !important; font-size:.85rem !important; }
 .stTextInput input:focus { border-color:rgba(201,169,110,.4) !important; box-shadow:0 0 0 2px rgba(201,169,110,.07) !important; }
 div[data-baseweb="select"] > div { background:var(--surf) !important; border:1px solid rgba(255,255,255,.09) !important; border-radius:7px !important; }
@@ -243,7 +291,7 @@ div[data-baseweb="select"] > div { background:var(--surf) !important; border:1px
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
-# CONSTANTS
+# CONSTANTS & HELPERS
 # ─────────────────────────────────────────────────────────────────
 TMDB_KEY = "e27947a52a97677530fdd9e476e8b17c"
 IMG_BASE  = "https://image.tmdb.org/t/p"
@@ -264,15 +312,8 @@ PROV_MAP = {
     'Jio Cinema':'https://www.jiocinema.com/search/',
 }
 def prov_href(n,t,fb=''): b=PROV_MAP.get(n,''); return (b+urllib.parse.quote(t)) if b else (fb or '#')
-def card_href(t,prev): return f"?movie={urllib.parse.quote(t)}&prev={prev}"
-def nav_href(pg): return f"?nav={pg}"
 
-# ─────────────────────────────────────────────────────────────────
-# MARGIN HELPER — the ONLY reliable spacing in Streamlit layout=wide
-# Uses side-spacer columns; immune to CSS overrides.
-# ─────────────────────────────────────────────────────────────────
 def C():
-    """Return the centred content column, surrounded by spacers."""
     _, col, _ = st.columns([1, 18, 1])
     return col
 
@@ -335,34 +376,81 @@ all_genres = sorted({g.strip() for gs in (movies_df['genres'] if movies_df is no
                      for g in gs.split('|') if g.strip() not in ('','(no genres listed)')})
 
 # ─────────────────────────────────────────────────────────────────
-# NAV
+# NAV  — all Streamlit buttons, no href, same page always
 # ─────────────────────────────────────────────────────────────────
 p   = st.session_state.page
 wlc = len(st.session_state.watchlist)
-badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
-def nc(pid): return "nav-link active" if p==pid else "nav-link"
 
-st.markdown(f"""
-<div class="nav">
-  <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
-    <div class="nav-sep"></div>
-    <nav class="nav-links">
-      <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
-      <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
-      <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
-    </nav>
-    <div style="flex:1;"></div>
-    <a class="nav-cta" href="{nav_href('recs')}">Get Recommendations</a>
-  </div>
-</div>
+st.markdown('<div class="nav-shell"></div>', unsafe_allow_html=True)
+
+# Pull the columns row up into the nav shell via margin-top
+_n0,_n1,_n2,_n3,_n4,_n5,_n6 = st.columns([0.01, 1.4, 0.8, 0.8, 1, 0.01, 1.2])
+
+with _n0:
+    st.markdown('<div style="height:62px;"></div>', unsafe_allow_html=True)
+
+with _n1:
+    st.markdown('<div class="nav-logo-btn">', unsafe_allow_html=True)
+    if st.button("CINEMATCH", key="nav_logo"):
+        go("home")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with _n2:
+    st.markdown(f'<div class="nav-btn{"  nav-btn-active" if p=="home" else ""}">', unsafe_allow_html=True)
+    if st.button("Browse", key="nav_browse"):
+        go("home")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with _n3:
+    st.markdown(f'<div class="nav-btn{"  nav-btn-active" if p=="recs" else ""}">', unsafe_allow_html=True)
+    if st.button("For You", key="nav_foryou"):
+        go("recs")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with _n4:
+    wl_lbl = f"Watchlist ({wlc})" if wlc else "Watchlist"
+    st.markdown(f'<div class="nav-btn{"  nav-btn-active" if p=="watchlist" else ""}">', unsafe_allow_html=True)
+    if st.button(wl_lbl, key="nav_wl"):
+        go("watchlist")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with _n5:
+    st.markdown('<div style="height:62px;"></div>', unsafe_allow_html=True)
+
+with _n6:
+    st.markdown('<div class="nav-cta-btn">', unsafe_allow_html=True)
+    if st.button("Get Recommendations", key="nav_cta"):
+        go("recs")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# CSS to pull the nav columns row up into the sticky shell
+st.markdown("""
+<style>
+/* target the nav columns row specifically */
+section[data-testid="stMain"] > div > div:nth-child(2) > div[data-testid="stHorizontalBlock"] {
+  position:relative !important;
+  margin-top:-62px !important;
+  height:62px !important;
+  background:rgba(8,9,14,0.97) !important;
+  backdrop-filter:blur(18px) !important;
+  border-bottom:1px solid rgba(255,255,255,0.07) !important;
+  z-index:9998 !important;
+  padding:0 32px !important;
+  align-items:center !important;
+}
+section[data-testid="stMain"] > div > div:nth-child(2) > div[data-testid="stHorizontalBlock"] [data-testid="column"] {
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
 
 # ─────────────────────────────────────────────────────────────────
-# CARD GRID
+# CARD GRID — invisible Streamlit button over each card
 # ─────────────────────────────────────────────────────────────────
 def render_grid(items, prev_page):
     with C():
@@ -371,14 +459,14 @@ def render_grid(items, prev_page):
             purl  = poster_url(title)
             icon  = GENRE_ICON.get(genre1,'🎬')
             short = title[:17]+'…' if len(title)>17 else title
-            href  = card_href(title, prev_page)
             img   = (f'<img class="mcard-img" src="{purl}" loading="lazy" alt="" '
                      f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
                      f'<div class="mcard-ph" style="display:none;">{icon}</div>'
                      if purl else f'<div class="mcard-ph">{icon}</div>')
             with cols[i%8]:
+                # Card HTML (display only)
                 st.markdown(f"""
-<a class="mc" href="{href}">
+<div class="card-wrap">
   <div class="mcard">
     {img}
     <div class="mcard-ov">
@@ -390,7 +478,11 @@ def render_grid(items, prev_page):
       <div class="mcard-genre">{genre1}</div>
     </div>
   </div>
-</a>""", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
+                # Invisible button covers the card — clicking it navigates
+                if st.button("▶", key=f"card_{prev_page}_{i}", help=title):
+                    open_movie(title, prev_page)
+                st.markdown("</div>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
 # DETAIL PAGE
@@ -415,27 +507,28 @@ def show_detail(title):
     backdrop = f"{IMG_BASE}/w1280{det['backdrop_path']}" if det.get('backdrop_path') else None
 
     if backdrop:
-        st.markdown(f'<div class="det-backdrop"><img src="{backdrop}" alt=""/><div class="det-fade"></div></div>',
-                    unsafe_allow_html=True)
+        st.markdown(f'<div class="det-backdrop"><img src="{backdrop}" alt=""/>'
+                    f'<div class="det-fade"></div></div>', unsafe_allow_html=True)
 
     alt  = ptitle.replace('"','')
-    pimg = (f'<img class="det-poster" src="{poster}" alt="{alt}" '
+    pimg = (f'<img class="det-poster" style="width:100%;border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,.88);display:block;" src="{poster}" alt="{alt}" '
             f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
-            f'<div class="det-poster-ph" style="display:none;">🎬</div>'
-            if poster else '<div class="det-poster-ph">🎬</div>')
+            f'<div style="width:100%;height:262px;border-radius:10px;background:var(--surf2);display:none;align-items:center;justify-content:center;font-size:2.8rem;">🎬</div>'
+            if poster else
+            '<div style="width:100%;height:262px;border-radius:10px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:2.8rem;">🎬</div>')
     gpills = ''.join(f'<span class="det-pill">{g}</span>' for g in genres)
     tagline_html = f'<div class="det-tagline">"{tagline}"</div>' if tagline else ''
 
     with C():
-        # Split into two columns: poster on left, all info + watchlist button on right
         poster_col, info_col = st.columns([1, 2.8])
 
         with poster_col:
-            st.markdown(pimg, unsafe_allow_html=True)
+            st.markdown(f'<div style="margin-top:-72px;position:relative;z-index:2;">{pimg}</div>',
+                        unsafe_allow_html=True)
 
         with info_col:
             st.markdown(f"""
-<div class="det-info" style="padding-top:0;">
+<div class="det-info">
   <div class="det-title">{ptitle}</div>
   <div class="det-meta">
     <span class="det-year">{year}</span>
@@ -461,7 +554,8 @@ def show_detail(title):
         videos  = det.get('videos',{}).get('results',[])
         trailer = next((v for v in videos if v.get('type')=='Trailer' and v.get('site')=='YouTube'),None)
         if trailer:
-            st.markdown(f'<div style="height:16px;"></div><a class="trailer-a" href="https://www.youtube.com/watch?v={trailer["key"]}" target="_blank">▶ Watch Trailer</a>',
+            st.markdown(f'<div style="height:20px;"></div>'
+                        f'<a class="trailer-a" href="https://www.youtube.com/watch?v={trailer["key"]}" target="_blank">▶ Watch Trailer</a>',
                         unsafe_allow_html=True)
 
         # Where to Watch
@@ -476,8 +570,7 @@ def show_detail(title):
                 if p2['provider_name'] not in seen:
                     seen.add(p2['provider_name']); combp.append((p2,lbl))
 
-        st.markdown('<div class="sub-divider" style="margin-top:28px;"></div>'
-                    '<div class="sub-h">Where to Watch</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-divider"></div><div class="sub-h">Where to Watch</div>', unsafe_allow_html=True)
         if combp:
             cards = ''
             for p2, lbl in combp[:10]:
@@ -493,8 +586,7 @@ def show_detail(title):
         # Cast
         cast = det.get('credits',{}).get('cast',[])[:14]
         if cast:
-            st.markdown('<div class="sub-divider" style="margin-top:28px;"></div>'
-                        '<div class="sub-h">Cast</div>', unsafe_allow_html=True)
+            st.markdown('<div class="sub-divider"></div><div class="sub-h">Cast</div>', unsafe_allow_html=True)
             ch = ''
             for c in cast:
                 cname = str(c.get('name','') or '')
@@ -528,7 +620,7 @@ if st.session_state.page == 'home':
 </div>""", unsafe_allow_html=True)
         if st.session_state.watchlist:
             if st.button(f"🎯 My Watchlist ({wlc})", key="wl_hero"):
-                st.session_state.page='watchlist'; st.rerun()
+                go("watchlist")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
@@ -556,7 +648,6 @@ if st.session_state.page == 'home':
     items = [(r['title'], r['genres'].split('|')[0].strip() if r['genres'] else '')
              for _,r in filtered.iterrows()]
     render_grid(items, 'home')
-
     st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
@@ -614,16 +705,15 @@ elif st.session_state.page == 'recs':
 
     st.markdown('<div style="height:36px;"></div>', unsafe_allow_html=True)
     with C():
-
-        st.markdown('<div class="sec-eye" style="margin-bottom:20px;margin-top:0;">Recommendation Mode</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-eye" style="margin-bottom:20px;">Recommendation Mode</div>', unsafe_allow_html=True)
         mc1, mc2, _ = st.columns([1.4, 1.6, 9])
         with mc1:
             if st.button("🎭  By Genre", key="mode_genre"):
-                st.session_state.rec_mode='genre'; st.session_state.recs=None
+                st.session_state.rec_mode='genre'; st.session_state.recs=None; st.rerun()
         with mc2:
             st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
             if st.button("🔍  By Search", key="mode_search"):
-                st.session_state.rec_mode='search'; st.session_state.recs=None
+                st.session_state.rec_mode='search'; st.session_state.recs=None; st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
         mode = st.session_state.rec_mode
@@ -653,7 +743,7 @@ elif st.session_state.page == 'recs':
             with gb2:
                 st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
                 if st.button("← Back to Browse", key="back_b"):
-                    st.session_state.page='home'; st.rerun()
+                    go("home")
                 st.markdown('</div>', unsafe_allow_html=True)
             if find_btn:
                 if not picked: st.warning("Please select at least one genre.")
@@ -676,7 +766,7 @@ elif st.session_state.page == 'recs':
             with sb2:
                 st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
                 if st.button("← Back to Browse", key="back_bs"):
-                    st.session_state.page='home'; st.rerun()
+                    go("home")
                 st.markdown('</div>', unsafe_allow_html=True)
             if srch_btn:
                 if not sq.strip(): st.warning("Please enter a description.")
@@ -705,10 +795,11 @@ elif st.session_state.page == 'recs':
                                  f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
                                  f'<div class="rec-poster-ph" style="display:none;">{GENRE_ICON.get(g0,"🎬")}</div>'
                                  if purl else f'<div class="rec-poster-ph">{GENRE_ICON.get(g0,"🎬")}</div>')
-                        num  = f"0{i+1}" if i+1<10 else str(i+1)
-                        href = card_href(row['title'],'recs')
+                        num = f"0{i+1}" if i+1<10 else str(i+1)
+
+                        # Card HTML + invisible Streamlit button overlay
                         st.markdown(f"""
-<a class="rc" href="{href}">
+<div class="rec-wrap">
   <div class="rec-card">
     <div class="rec-num">{num}</div>
     {ph}
@@ -720,7 +811,10 @@ elif st.session_state.page == 'recs':
       <div class="rec-hint">Click to view full details →</div>
     </div>
   </div>
-</a>""", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
+                        if st.button("▶", key=f"rec_{i}", help=row['title']):
+                            open_movie(row['title'], 'recs')
+                        st.markdown("</div>", unsafe_allow_html=True)
 
                 with rc:
                     st.markdown('<div class="chart-panel">', unsafe_allow_html=True)
