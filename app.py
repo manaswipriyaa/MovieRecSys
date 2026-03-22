@@ -338,7 +338,7 @@ def nc(pid): return "nav-link active" if p==pid else "nav-link"
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('logo')}">CineMatch</a>
+    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
@@ -388,11 +388,6 @@ def render_grid(items, prev_page):
 # ─────────────────────────────────────────────────────────────────
 def show_detail(title):
     st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
-    with C():
-        st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
-        if st.button("← Back", key="back_btn"):
-            st.session_state.movie=None; st.session_state.page=st.session_state.prev; st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
     det = tmdb_details(title)
     if not det or 'title' not in det:
