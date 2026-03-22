@@ -68,14 +68,24 @@ html, body, [class*="css"] {
 }
 .stApp { background: var(--bg) !important; color: var(--txt); }
 
-/* Strip all Streamlit padding */
-.block-container                           { padding: 0 !important; max-width: 100% !important; }
-section[data-testid="stMain"] > div       { padding: 0 !important; }
+/* Strip only Streamlit structural padding — not our own divs */
+.block-container { padding: 0 !important; max-width: 100% !important; }
+section[data-testid="stMain"] > div { padding: 0 !important; }
 div[data-testid="stSidebar"], footer, header { display: none !important; }
-div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
-.stVerticalBlock                           { gap: 0 !important; }
-/* remove gap that appears above first element */
-.stMainBlockContainer > div:first-child   { margin-top: 0 !important; }
+.stVerticalBlock { gap: 0 !important; }
+.stMainBlockContainer > div:first-child { margin-top: 0 !important; }
+
+/* ── CONTENT WRAPPER ────────────────────────────────────────
+   Apply .W to every section. Gives breathing room on both sides.
+   Uses !important so Streamlit's reset can't touch it.
+─────────────────────────────────────────────────────────── */
+.W {
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 72px !important;
+  padding-right: 72px !important;
+}
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -105,7 +115,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
 .nav-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 72px;
   height: 62px;
   display: flex;
   align-items: center;
@@ -236,7 +246,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] > div { padding: 0 !important; }
   background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 65%);
   pointer-events: none;
 }
-.hero-body { max-width: 1200px; margin: 0 auto; padding: 52px 80px 44px; }
+.hero-body { max-width: 1200px; margin: 0 auto; padding: 52px 72px 44px; }
 .hero-eye {
   font-size: 0.58rem; letter-spacing: 4px; text-transform: uppercase;
   color: var(--gold); font-weight: 500; margin-bottom: 14px;
@@ -318,7 +328,7 @@ a.mc:hover .mcard-ov { opacity: 1; }
 ═══════════════════════════════════════ */
 .btm { background: linear-gradient(120deg, #100e24, #17102a); border-top: 1px solid rgba(201,169,110,0.1); margin-top: 52px; border-radius: 0; }
 .btm-inner {
-  max-width: 1200px; margin: 0 auto; padding: 40px 80px;
+  max-width: 1200px; margin: 0 auto; padding: 40px 72px;
   display: flex; align-items: center;
   justify-content: space-between; gap: 48px; flex-wrap: nowrap;
 }
@@ -329,11 +339,11 @@ a.mc:hover .mcard-ov { opacity: 1; }
 /* ═══════════════════════════════════════
    DETAIL PAGE
 ═══════════════════════════════════════ */
-.det-top  { max-width: 1200px; margin: 0 auto; padding: 22px 80px 0; }
+.det-top  { max-width: 1200px; margin: 0 auto; padding: 22px 72px 0; }
 .det-backdrop { width: 100%; height: 210px; position: relative; overflow: hidden; }
 .det-backdrop img { width: 100%; height: 100%; object-fit: cover; opacity: 0.18; display: block; }
 .det-fade { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 55%); }
-.det-body { max-width: 1200px; margin: 0 auto; padding: 0 80px 56px; }
+.det-body { max-width: 1200px; margin: 0 auto; padding: 0 72px 56px; }
 .det-flex { display: flex; gap: 40px; align-items: flex-start; margin-top: -72px; position: relative; z-index: 2; }
 .det-poster { width: 175px; min-width: 175px; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.88); display: block; }
 .det-poster-ph { width: 175px; min-width: 175px; height: 262px; border-radius: 10px; background: var(--surf2); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; }
@@ -347,7 +357,7 @@ a.mc:hover .mcard-ov { opacity: 1; }
 .det-pill { display: inline-block; background: rgba(255,255,255,0.04); color: #aaa; font-size: 0.67rem; padding: 3px 11px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.07); margin-right: 5px; margin-bottom: 5px; }
 .trailer-a { display: inline-flex; align-items: center; gap: 8px; background: rgba(224,92,92,0.1); color: #ef8080; font-size: 0.73rem; font-weight: 600; padding: 9px 20px; border-radius: 6px; border: 1px solid rgba(224,92,92,0.2); text-decoration: none; }
 .trailer-a:hover { background: rgba(224,92,92,0.18); }
-.sub-sec { max-width: 1200px; margin: 0 auto; padding: 26px 80px; border-top: 1px solid var(--bdr); }
+.sub-sec { max-width: 1200px; margin: 0 auto; padding: 26px 72px; border-top: 1px solid var(--bdr); }
 .sub-h { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 16px; }
 .providers { display: flex; flex-wrap: wrap; gap: 10px; }
 .prov { background: var(--surf); border-radius: 9px; border: 1px solid var(--bdr); padding: 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 84px; text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
@@ -653,8 +663,7 @@ def show_detail(title):
 
     # Watchlist toggle
     in_wl = title in st.session_state.watchlist
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:8px 80px 16px;'
-                'display:flex;gap:12px;">', unsafe_allow_html=True)
+    st.markdown('<div class="W" style="padding-top:8px;padding-bottom:16px;display:flex;gap:12px;">', unsafe_allow_html=True)
     if in_wl:
         st.markdown('<div class="btn-danger">', unsafe_allow_html=True)
         if st.button("✓ In Watchlist — Remove", key="wl_tog"):
@@ -742,7 +751,7 @@ if st.session_state.page == 'home':
 </div>""", unsafe_allow_html=True)
 
     # CTA row
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:28px 80px 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="W" style="padding-top:28px;">', unsafe_allow_html=True)
     ca, cb, _ = st.columns([1.6, 1.8, 8])
     with ca:
         if st.button("Get Recommendations →", key="hero_cta"):
@@ -759,7 +768,7 @@ if st.session_state.page == 'home':
     st.markdown('<div class="divider" style="margin-top:28px;"></div>', unsafe_allow_html=True)
 
     # Browse section
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:32px 80px 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="W" style="padding-top:32px;">', unsafe_allow_html=True)
     st.markdown('<div class="sec-eye">Explore</div>', unsafe_allow_html=True)
     st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
 
@@ -782,7 +791,7 @@ if st.session_state.page == 'home':
     st.markdown(f'<div class="count">{len(filtered)} TITLES</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:0 80px;">', unsafe_allow_html=True)
+    st.markdown('<div class="W">', unsafe_allow_html=True)
     items = [(row['title'], row['genres'].split('|')[0].strip() if row['genres'] else '')
              for _, row in filtered.iterrows()]
     render_grid(items, 'home')
@@ -821,9 +830,8 @@ elif st.session_state.page == 'watchlist':
   <p style="font-size:.83rem;">Open any movie and tap "Add to Watchlist".</p>
 </div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f'<div style="max-width:1200px;margin:0 auto;padding:28px 80px 0;">'
-                    f'<div class="count">{len(wl)} SAVED</div></div>', unsafe_allow_html=True)
-        st.markdown('<div style="max-width:1200px;margin:0 auto;padding:0 80px;">', unsafe_allow_html=True)
+        st.markdown(f'<div class="W" style="padding-top:28px;"><div class="count">{len(wl)} SAVED</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="W">', unsafe_allow_html=True)
         wl_items = []
         for t in wl:
             gr     = movies_df[movies_df['title'] == t]
@@ -831,7 +839,7 @@ elif st.session_state.page == 'watchlist':
             wl_items.append((t, genre1))
         render_grid(wl_items, 'watchlist')
         st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('<div style="max-width:1200px;margin:0 auto;padding:20px 80px 48px;">', unsafe_allow_html=True)
+        st.markdown('<div class="W" style="padding-top:20px;padding-bottom:48px;">', unsafe_allow_html=True)
         st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
         if st.button("Clear Watchlist", key="clear_wl"):
             st.session_state.watchlist = []; st.rerun()
@@ -851,7 +859,7 @@ elif st.session_state.page == 'recs':
   </div>
 </div>""", unsafe_allow_html=True)
 
-    st.markdown('<div style="max-width:1200px;margin:0 auto;padding:40px 80px 0;">', unsafe_allow_html=True)
+    st.markdown('<div class="W" style="padding-top:40px;">', unsafe_allow_html=True)
 
     # Mode toggle
     st.markdown('<div class="sec-eye" style="margin-bottom:16px;">Recommendation Mode</div>',
