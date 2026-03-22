@@ -533,7 +533,7 @@ if st.session_state.page == 'home':
     st.markdown('<div style="height:32px;"></div>', unsafe_allow_html=True)
 
     with C():
-        st.markdown('<div class="sec-eye" style="margin-bottom:4px;">Explore</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-eye" style="margin-bottom:10px;">Explore</div>', unsafe_allow_html=True)
         st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
         f1, f2 = st.columns([3, 1])
         with f1:
