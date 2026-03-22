@@ -166,10 +166,7 @@ a.mc:hover .mcard-ov { opacity:1; }
 .mcard-genre { font-size:.59rem; color:var(--muted); }
 
 /* BOTTOM BANNER */
-.btm { background:linear-gradient(120deg,#100e24,#17102a); border-top:1px solid rgba(201,169,110,.1); padding:44px 0; margin-top:52px; }
-.btm-inner { display:flex; align-items:center; justify-content:space-between; gap:40px; }
-.btm-title { font-family:'Playfair Display',serif; font-weight:700; font-size:1.25rem; color:#fff; margin-bottom:6px; }
-.btm-sub { font-size:.82rem; color:var(--muted); font-weight:300; }
+
 
 /* DETAIL */
 .det-backdrop { width:100%; height:210px; position:relative; overflow:hidden; }
@@ -557,19 +554,7 @@ if st.session_state.page == 'home':
              for _,r in filtered.iterrows()]
     render_grid(items, 'home')
 
-    st.markdown('<div class="btm">', unsafe_allow_html=True)
-    with C():
-        btm_left, btm_right = st.columns([3, 1.2])
-        with btm_left:
-            st.markdown("""
-<div class="btm-title">Not sure what to watch?</div>
-<div class="btm-sub">Tell us your favourite genres or describe what you're in the mood for.</div>""", unsafe_allow_html=True)
-        with btm_right:
-            st.markdown('<div style="display:flex;align-items:center;height:100%;padding-top:6px;">', unsafe_allow_html=True)
-            if st.button("Find My Movies →", key="banner_cta"):
-                st.session_state.page='recs'; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div><div style="height:48px;"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
 # WATCHLIST
@@ -627,7 +612,7 @@ elif st.session_state.page == 'recs':
     st.markdown('<div style="height:36px;"></div>', unsafe_allow_html=True)
     with C():
 
-        st.markdown('<div class="sec-eye" style="margin-bottom:14px;">Recommendation Mode</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-eye" style="margin-bottom:20px;margin-top:0;">Recommendation Mode</div>', unsafe_allow_html=True)
         mc1, mc2, _ = st.columns([1.4, 1.6, 9])
         with mc1:
             if st.button("🎭  By Genre", key="mode_genre"):
