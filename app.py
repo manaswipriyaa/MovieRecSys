@@ -1,16 +1,14 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+import urllib.parse
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import os, re, requests, urllib.parse
 
 st.set_page_config(page_title="CineMatch", layout="wide")
 
-# ───────────────────────────────────────────────────────────────
-# ROUTING
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# STATE + ROUTING
+# ─────────────────────────────────────────────
 qp = st.query_params.to_dict()
 
 if "movie" in qp:
@@ -33,45 +31,56 @@ for k, v in {
     if k not in st.session_state:
         st.session_state[k] = v
 
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # HELPERS
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 def nav_href(pg):
     return f"?nav={pg}"
 
-def card_href(t):
-    return f"?movie={urllib.parse.quote(t)}"
+def card_href(title):
+    return f"?movie={urllib.parse.quote(title)}"
 
-# ───────────────────────────────────────────────────────────────
-# STYLES
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# CSS
+# ─────────────────────────────────────────────
 st.markdown("""
 <style>
 body {background:#08090e; color:white;}
+
 .nav {
-  position:sticky; top:0;
-  background:#08090e;
+  position:sticky;
+  top:0;
+  display:flex;
+  align-items:center;
   padding:15px 50px;
-  display:flex; align-items:center;
+  background:#08090e;
   border-bottom:1px solid rgba(255,255,255,0.08);
+  z-index:1000;
 }
+
 .nav-logo {
-  font-family:serif;
   font-size:22px;
-  letter-spacing:3px;
+  letter-spacing:4px;
+  font-weight:bold;
   color:#c9a96e;
   text-decoration:none;
-  font-weight:bold;
 }
+
 .nav-links {
   margin-left:30px;
 }
+
 .nav-links a {
   margin-right:20px;
-  color:#aaa;
   text-decoration:none;
+  color:#aaa;
+  font-size:14px;
 }
-.nav-links a:hover {color:#c9a96e;}
+
+.nav-links a:hover {
+  color:#c9a96e;
+}
+
 .nav-cta {
   margin-left:auto;
   background:#c9a96e;
@@ -81,17 +90,19 @@ body {background:#08090e; color:white;}
   text-decoration:none;
   font-weight:600;
 }
+
 .card {
   background:#141520;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
+  margin-bottom:10px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # NAVBAR
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 st.markdown(f"""
 <div class="nav">
   <a class="nav-logo" href="{nav_href('home')}">CINEMATCH</a>
@@ -106,19 +117,18 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ───────────────────────────────────────────────────────────────
-# DATA
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# LOAD DATA
+# ─────────────────────────────────────────────
 @st.cache_data
-def load():
-    movies = pd.read_csv("data/movies.csv")
-    return movies
+def load_data():
+    return pd.read_csv("data/movies.csv")
 
-movies = load()
+movies = load_data()
 
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # HOME PAGE
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 if st.session_state.page == "home":
 
     st.title("Browse Movies")
@@ -129,16 +139,14 @@ if st.session_state.page == "home":
         with cols[i % 5]:
             st.markdown(f"""
 <a href="{card_href(row['title'])}" target="_self">
-  <div class="card">
-    🎬 {row['title']}
-  </div>
+  <div class="card">🎬 {row['title']}</div>
 </a>
 """, unsafe_allow_html=True)
 
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # DETAIL PAGE
-# ───────────────────────────────────────────────────────────────
-elif st.session_state.movie:
+# ─────────────────────────────────────────────
+elif st.session_state.page == "detail":
 
     title = st.session_state.movie
     st.title(title)
@@ -152,9 +160,9 @@ elif st.session_state.movie:
             st.session_state.watchlist.remove(title)
             st.rerun()
 
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # WATCHLIST
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 elif st.session_state.page == "watchlist":
 
     st.title("My Watchlist")
@@ -166,14 +174,14 @@ elif st.session_state.page == "watchlist":
 </a>
 """, unsafe_allow_html=True)
 
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 # RECOMMENDATIONS
-# ───────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────
 elif st.session_state.page == "recs":
 
     st.title("Get Recommendations")
 
-    query = st.text_input("What do you want to watch?")
+    query = st.text_input("Describe a movie")
 
     if query:
         tfidf = TfidfVectorizer()
