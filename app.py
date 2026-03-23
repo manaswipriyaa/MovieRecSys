@@ -345,7 +345,7 @@ def nc(pid): return "nav-link active" if p==pid else "nav-link"
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('logo')}">CineMatch</a>
+    <span class="nav-logo" onclick="window.location.href='{nav_href('logo')}'">CineMatch</span>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
