@@ -120,6 +120,15 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   transition:opacity .15s !important; transform:none !important;
 }
 .stButton > button:hover { opacity:.85 !important; transform:none !important; }
+/* Nav CTA button styling */
+[data-testid="stVerticalBlock"] > div:has(button[key="nav_cta_btn"]) button {
+  background:var(--gold) !important; color:#08090e !important;
+  font-family:'Outfit',sans-serif !important; font-size:.7rem !important;
+  font-weight:700 !important; letter-spacing:1.5px !important;
+  text-transform:uppercase !important; padding:8px 20px !important;
+  border-radius:6px !important; border:none !important;
+  box-shadow:none !important;
+}
 .btn-ghost .stButton > button {
   background:transparent !important; color:var(--muted) !important;
   border:1px solid rgba(255,255,255,.13) !important; box-shadow:none !important;
@@ -352,10 +361,18 @@ st.markdown(f"""
       <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
     </nav>
     <div style="flex:1;"></div>
-    <a class="nav-cta" href="{nav_href('recs')}">Get Recommendations</a>
   </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Get Recommendations button using Streamlit
+with st.container():
+    st.markdown('<div style="position:absolute;top:11px;right:48px;z-index:10000;">', unsafe_allow_html=True)
+    if st.button("GET RECOMMENDATIONS", key="nav_cta_btn"):
+        st.session_state.page = 'recs'
+        st.session_state.movie = None
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
