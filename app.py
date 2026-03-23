@@ -31,7 +31,7 @@ for k, v in {"page":"home","prev":"home","movie":None,"genres":[],
 # ─────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&family=Cinzel:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --bg:#08090e; --surf:#0e0f18; --surf2:#141520;
@@ -63,11 +63,13 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   display:flex; align-items:center; gap:0;
 }
 .nav-logo {
-  font-family:'Playfair Display',serif; font-weight:900;
-  font-size:1.05rem; letter-spacing:5px; text-transform:uppercase;
+  font-family:'Cinzel',serif; font-weight:700;
+  font-size:1.15rem; letter-spacing:4px; text-transform:uppercase;
   color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
-  text-decoration:none;
+  text-decoration:none; cursor:pointer;
+  transition:color .15s, opacity .15s;
 }
+.nav-logo:hover { color:var(--gold2); opacity:0.9; }
 .nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
 .nav-links { display:flex; align-items:center; gap:2px; }
 .nav-link {
@@ -342,10 +344,25 @@ wlc = len(st.session_state.watchlist)
 badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
 def nc(pid): return "nav-link active" if p==pid else "nav-link"
 
+# JavaScript to handle logo click that resets state and redirects
+st.markdown("""
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logoLink = document.querySelector('.nav-logo');
+    if (logoLink) {
+        logoLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '?nav=logo';
+        });
+    }
+});
+</script>
+""", unsafe_allow_html=True)
+
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
+    <a class="nav-logo" href="{nav_href('logo')}">CINEMATCH</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
