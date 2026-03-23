@@ -120,14 +120,15 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   transition:opacity .15s !important; transform:none !important;
 }
 .stButton > button:hover { opacity:.85 !important; transform:none !important; }
-/* Nav CTA button styling */
-[data-testid="stVerticalBlock"] > div:has(button[key="nav_cta_btn"]) button {
+/* Nav CTA button specific styling */
+button[data-testid*="baseButton"][kind="primary"]:has-text("GET RECOMMENDATIONS"),
+div:has(> button[key="nav_cta_btn"]) button {
   background:var(--gold) !important; color:#08090e !important;
   font-family:'Outfit',sans-serif !important; font-size:.7rem !important;
   font-weight:700 !important; letter-spacing:1.5px !important;
   text-transform:uppercase !important; padding:8px 20px !important;
   border-radius:6px !important; border:none !important;
-  box-shadow:none !important;
+  box-shadow:none !important; white-space:nowrap !important;
 }
 .btn-ghost .stButton > button {
   background:transparent !important; color:var(--muted) !important;
@@ -361,13 +362,15 @@ st.markdown(f"""
       <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
     </nav>
     <div style="flex:1;"></div>
+    <div id="nav-cta-btn"></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Get Recommendations button using Streamlit
-with st.container():
-    st.markdown('<div style="position:absolute;top:11px;right:48px;z-index:10000;">', unsafe_allow_html=True)
+# Insert the button using Streamlit's button component positioned in the nav
+col1, col2 = st.columns([19, 1])
+with col2:
+    st.markdown('<div style="margin-top:-62px;margin-right:48px;">', unsafe_allow_html=True)
     if st.button("GET RECOMMENDATIONS", key="nav_cta_btn"):
         st.session_state.page = 'recs'
         st.session_state.movie = None
