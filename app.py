@@ -69,18 +69,14 @@ title_to_movie_id = dict(zip(movies_df['title'], movies_df['movieId']))
 def tmdb_search(title):
     if title in st.session_state.tmdb_cache:
         return st.session_state.tmdb_cache[title]
-try:
-    r = requests.get(
-        "https://api.themoviedb.org/3/search/movie",
-        params={"api_key": TMDB_KEY, "query": title},
-        timeout=5
-    )
-    res = r.json().get('results', [])
-    result = res[0] if res else None
-    st.session_state.tmdb_cache[title] = result
-    return result
-except:
-    return None
+        try:
+            r = requests.get("https://api.themoviedb.org/3/search/movie",params={"api_key": TMDB_KEY, "query": title},timeout=5)
+            res = r.json().get('results', [])
+            result = res[0] if res else None
+            st.session_state.tmdb_cache[title] = result
+            return result
+        except:
+            return None
 
 def poster_url(title):
     r = tmdb_search(title)
