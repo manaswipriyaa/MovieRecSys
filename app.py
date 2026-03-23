@@ -346,9 +346,9 @@ st.markdown(f"""
   <div class="nav-inner">
     <div class="nav-logo">CINEMATCH</div>
     <nav class="nav-links">
-      <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
-      <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
-      <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
+      <a class="{nc('home')}"      href="{nav_href('home')}" onclick="event.preventDefault(); window.location.href='{nav_href('home')}'; return false;">Browse</a>
+      <a class="{nc('recs')}"      href="{nav_href('recs')}" onclick="event.preventDefault(); window.location.href='{nav_href('recs')}'; return false;">For You</a>
+      <a class="{nc('watchlist')}" href="{nav_href('watchlist')}" onclick="event.preventDefault(); window.location.href='{nav_href('watchlist')}'; return false;">Watchlist{badge}</a>
     </nav>
   </div>
 </div>
