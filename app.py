@@ -69,8 +69,6 @@ title_to_movie_id = dict(zip(movies_df['title'], movies_df['movieId']))
 def tmdb_search(title):
     if title in st.session_state.tmdb_cache:
         return st.session_state.tmdb_cache[title]
-
-```
 try:
     r = requests.get(
         "https://api.themoviedb.org/3/search/movie",
@@ -83,7 +81,6 @@ try:
     return result
 except:
     return None
-```
 
 def poster_url(title):
     r = tmdb_search(title)
@@ -120,7 +117,6 @@ def collab_recs(watchlist, user_movie, reconstructed, n=20):
     if not watchlist:
         return pd.DataFrame()
 
-```
 user_vec = np.zeros(user_movie.shape[1])
 
 for t in watchlist:
@@ -144,7 +140,6 @@ for idx, score in ranked[:n*2]:
         })
 
 return pd.DataFrame(res[:n])
-```
 
 # ------------------------------
 
@@ -153,7 +148,6 @@ return pd.DataFrame(res[:n])
 # ------------------------------
 
 def hybrid_recs(picked, watchlist, mdf, n=10):
-    ```
     tfidf, mat = build_tfidf(mdf)
     cos = cosine_similarity(
     tfidf.transform(['|'.join(picked)]),
@@ -181,7 +175,6 @@ mdf['score'] = scores
 top = mdf.sort_values(by='score', ascending=False).head(n)
 
 return top[['title','genres','score']]
-```
 
 # ------------------------------
 
@@ -216,7 +209,6 @@ def because_you_watched(watchlist, mdf, n=8):
     if not watchlist:
         return []
 
-```
 seed = watchlist[-1]
 row = mdf[mdf['title']==seed]
 if row.empty:
@@ -226,7 +218,6 @@ genres = row.iloc[0]['genres'].split('|')
 recs = hybrid_recs(genres, watchlist, mdf.copy(), n)
 
 return [(r['title'], r['genres'].split('|')[0]) for _, r in recs.iterrows()]
-```
 
 def trending_now(ratings_df, mdf, n=10):
     pop = ratings_df.groupby('movieId').size().sort_values(ascending=False).head(n)
