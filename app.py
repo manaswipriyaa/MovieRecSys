@@ -35,7 +35,8 @@ st.session_state[k] = v
 
 # ------------------------------
 
-TMDB_KEY = "YOUR_KEY"
+TMDB_KEY = "
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlMjc5NDdhNTJhOTc2Nzc1MzBmZGQ5ZTQ3NmU4YjE3YyIsIm5iZiI6MTc0NDAyNTU1Mi40NzIsInN1YiI6IjY3ZjNiN2QwYTU0NzFhNTFlZTk5NjFjMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jnnqOIMvbzOrkx1Wy6Kll6OP5R5MIGEHHr9mq9124Pc"
 IMG_BASE = "https://image.tmdb.org/t/p"
 
 # ------------------------------
