@@ -23,7 +23,7 @@ st.set_page_config(page_title="CineMatch", layout="wide", initial_sidebar_state=
 # ------------------------------
 
 if "tmdb_cache" not in st.session_state:
-st.session_state.tmdb_cache = {}
+    st.session_state.tmdb_cache = {}
 
 for k, v in {"page":"home","movie":None,"watchlist":[],"recs":None,"search_q":""}.items():
 if k not in st.session_state:
