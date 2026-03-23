@@ -66,14 +66,14 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   font-family:'Playfair Display',serif; font-weight:900;
   font-size:1.05rem; letter-spacing:5px; text-transform:uppercase;
   color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
-  text-decoration:none; cursor:pointer;
+  text-decoration:none;
 }
 .nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
 .nav-links { display:flex; align-items:center; gap:2px; }
 .nav-link {
   font-size:0.7rem; font-weight:500; letter-spacing:2px; text-transform:uppercase;
   color:var(--muted); text-decoration:none; padding:8px 18px; border-radius:5px;
-  white-space:nowrap; transition:color .15s, background .15s; cursor:pointer;
+  white-space:nowrap; transition:color .15s, background .15s;
 }
 .nav-link:hover { color:var(--gold); background:rgba(201,169,110,0.07); }
 .nav a, .nav-logo, .nav-link, .nav-cta { text-decoration:none !important; }
@@ -89,7 +89,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   font-family:'Outfit',sans-serif; font-size:0.7rem; font-weight:700;
   letter-spacing:1.5px; text-transform:uppercase; text-decoration:none;
   padding:8px 20px; border-radius:6px; white-space:nowrap; flex-shrink:0;
-  transition:opacity .15s; cursor:pointer;
+  transition:opacity .15s;
 }
 .nav-cta:hover { opacity:0.85; }
 
@@ -335,7 +335,7 @@ all_genres = sorted({g.strip() for gs in (movies_df['genres'] if movies_df is no
                      for g in gs.split('|') if g.strip() not in ('','(no genres listed)')})
 
 # ─────────────────────────────────────────────────────────────────
-# NAV - KEY CHANGES HERE: Using <span> with onclick instead of <a> with href
+# NAV
 # ─────────────────────────────────────────────────────────────────
 p   = st.session_state.page
 wlc = len(st.session_state.watchlist)
@@ -345,15 +345,15 @@ def nc(pid): return "nav-link active" if p==pid else "nav-link"
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <span class="nav-logo" onclick="window.location.href='{nav_href('logo')}'">CineMatch</span>
+    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
-      <span class="{nc('home')}" onclick="window.location.href='{nav_href('home')}'">Browse</span>
-      <span class="{nc('recs')}" onclick="window.location.href='{nav_href('recs')}'">For You</span>
-      <span class="{nc('watchlist')}" onclick="window.location.href='{nav_href('watchlist')}'">Watchlist{badge}</span>
+      <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
+      <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
+      <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
     </nav>
     <div style="flex:1;"></div>
-    <span class="nav-cta" onclick="window.location.href='{nav_href('recs')}'">Get Recommendations</span>
+    <a class="nav-cta" href="{nav_href('recs')}">Get Recommendations</a>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -361,4 +361,390 @@ st.markdown(f"""
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
 
-# ... rest of the code continues exactly as before ...
+# ─────────────────────────────────────────────────────────────────
+# CARD GRID
+# ─────────────────────────────────────────────────────────────────
+def render_grid(items, prev_page):
+    with C():
+        cols = st.columns(8, gap="small")
+        for i, (title, genre1) in enumerate(items):
+            purl  = poster_url(title)
+            icon  = GENRE_ICON.get(genre1,'🎬')
+            short = title[:17]+'…' if len(title)>17 else title
+            href  = card_href(title, prev_page)
+            img   = (f'<img class="mcard-img" src="{purl}" loading="lazy" alt="" '
+                     f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
+                     f'<div class="mcard-ph" style="display:none;">{icon}</div>'
+                     if purl else f'<div class="mcard-ph">{icon}</div>')
+            with cols[i%8]:
+                st.markdown(f"""
+<a class="mc" href="{href}">
+  <div class="mcard">
+    {img}
+    <div class="mcard-ov">
+      <div class="mcard-ov-t">{short}</div>
+      <div class="mcard-ov-s">{genre1}</div>
+    </div>
+    <div class="mcard-body">
+      <div class="mcard-title">{short}</div>
+      <div class="mcard-genre">{genre1}</div>
+    </div>
+  </div>
+</a>""", unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────
+# DETAIL PAGE
+# ─────────────────────────────────────────────────────────────────
+def show_detail(title):
+    st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
+
+    det = tmdb_details(title)
+    if not det or 'title' not in det:
+        with C(): st.warning("Could not load details from TMDB.")
+        return
+
+    ptitle   = str(det.get('title',title) or title)
+    overview = str(det.get('overview','') or '')
+    tagline  = str(det.get('tagline','') or '')
+    year     = str(det.get('release_date','')[:4])
+    rating   = round(det.get('vote_average',0),1)
+    rt       = det.get('runtime') or 0
+    runtime  = f"{rt//60}h {rt%60}m" if rt else ''
+    genres   = [str(g['name']) for g in det.get('genres',[])]
+    poster   = f"{IMG_BASE}/w400{det['poster_path']}"    if det.get('poster_path')   else None
+    backdrop = f"{IMG_BASE}/w1280{det['backdrop_path']}" if det.get('backdrop_path') else None
+
+    if backdrop:
+        st.markdown(f'<div class="det-backdrop"><img src="{backdrop}" alt=""/><div class="det-fade"></div></div>',
+                    unsafe_allow_html=True)
+
+    alt  = ptitle.replace('"','')
+    pimg = (f'<img class="det-poster" src="{poster}" alt="{alt}" '
+            f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
+            f'<div class="det-poster-ph" style="display:none;">🎬</div>'
+            if poster else '<div class="det-poster-ph">🎬</div>')
+    gpills = ''.join(f'<span class="det-pill">{g}</span>' for g in genres)
+    tagline_html = f'<div class="det-tagline">"{tagline}"</div>' if tagline else ''
+
+    with C():
+        # Split into two columns: poster on left, all info + watchlist button on right
+        poster_col, info_col = st.columns([1, 2.8])
+
+        with poster_col:
+            st.markdown(pimg, unsafe_allow_html=True)
+
+        with info_col:
+            st.markdown(f"""
+<div class="det-info" style="padding-top:0;">
+  <div class="det-title">{ptitle}</div>
+  <div class="det-meta">
+    <span class="det-year">{year}</span>
+    <span class="det-rating">&#9733; {rating} / 10</span>
+    <span class="det-rt">{runtime}</span>
+  </div>
+  {tagline_html}
+  <div class="det-ov">{overview}</div>
+  <div style="margin-bottom:18px;">{gpills}</div>
+</div>""", unsafe_allow_html=True)
+
+            in_wl = title in st.session_state.watchlist
+            if in_wl:
+                st.markdown('<div class="btn-danger">', unsafe_allow_html=True)
+                if st.button("✓ In Watchlist — Remove", key="wl_tog"):
+                    st.session_state.watchlist.remove(title); st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                if st.button("＋ Add to Watchlist", key="wl_tog"):
+                    st.session_state.watchlist.append(title); st.rerun()
+
+        # Trailer
+        videos  = det.get('videos',{}).get('results',[])
+        trailer = next((v for v in videos if v.get('type')=='Trailer' and v.get('site')=='YouTube'),None)
+        if trailer:
+            st.markdown(f'<div style="height:16px;"></div><a class="trailer-a" href="https://www.youtube.com/watch?v={trailer["key"]}" target="_blank">▶ Watch Trailer</a>',
+                        unsafe_allow_html=True)
+
+        # Where to Watch
+        pd_data = det.get('watch/providers',{}).get('results',{})
+        region  = pd_data.get('IN', pd_data.get('US',{}))
+        jtw     = region.get('link','')
+        seen, combp = set(), []
+        for lbl, lst in [('Stream',region.get('flatrate',[])),
+                          ('Rent',region.get('rent',[])),
+                          ('Buy',region.get('buy',[]))]:
+            for p2 in lst:
+                if p2['provider_name'] not in seen:
+                    seen.add(p2['provider_name']); combp.append((p2,lbl))
+
+        st.markdown('<div class="sub-divider" style="margin-top:28px;"></div>'
+                    '<div class="sub-h">Where to Watch</div>', unsafe_allow_html=True)
+        if combp:
+            cards = ''
+            for p2, lbl in combp[:10]:
+                logo = f'{IMG_BASE}/w92{p2["logo_path"]}' if p2.get('logo_path') else None
+                img  = f'<img src="{logo}" alt=""/>' if logo \
+                       else '<div style="width:40px;height:40px;background:var(--surf2);border-radius:7px;"></div>'
+                href = prov_href(p2['provider_name'],ptitle,jtw)
+                cards += f'<a class="prov" href="{href}" target="_blank" rel="noopener">{img}<div class="prov-n">{p2["provider_name"]}</div><div class="prov-t">{lbl}</div></a>'
+            st.markdown(f'<div class="providers">{cards}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<p style="font-size:.8rem;color:var(--muted);">No streaming data for your region.</p>', unsafe_allow_html=True)
+
+        # Cast
+        cast = det.get('credits',{}).get('cast',[])[:14]
+        if cast:
+            st.markdown('<div class="sub-divider" style="margin-top:28px;"></div>'
+                        '<div class="sub-h">Cast</div>', unsafe_allow_html=True)
+            ch = ''
+            for c in cast:
+                cname = str(c.get('name','') or '')
+                cchar = str(c.get('character','') or '')[:22]
+                img   = f'{IMG_BASE}/w185{c["profile_path"]}' if c.get('profile_path') else None
+                ph    = f'<img class="cast-img" src="{img}" alt=""/>' if img else '<div class="cast-ph">👤</div>'
+                ch   += f'<div class="cast-card">{ph}<div class="cast-name">{cname}</div><div class="cast-char">{cchar}</div></div>'
+            st.markdown(f'<div class="cast-grid">{ch}</div>', unsafe_allow_html=True)
+
+    st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────
+# ROUTER
+# ─────────────────────────────────────────────────────────────────
+if st.session_state.movie:
+    show_detail(st.session_state.movie); st.stop()
+
+# ─────────────────────────────────────────────────────────────────
+# HOME
+# ─────────────────────────────────────────────────────────────────
+if st.session_state.page == 'home':
+
+    st.markdown('<div class="hero">', unsafe_allow_html=True)
+    with C():
+        st.markdown("""
+<div class="hero-body">
+  <div class="hero-eye">AI-Powered Discovery</div>
+  <div class="hero-h">Your next favourite<br><em>film</em> awaits.</div>
+  <div class="hero-p">Browse thousands of movies or let our engine recommend
+  films tailored to your taste — no account needed.</div>
+</div>""", unsafe_allow_html=True)
+        if st.session_state.watchlist:
+            if st.button(f"🎯 My Watchlist ({wlc})", key="wl_hero"):
+                st.session_state.page='watchlist'; st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:32px;"></div>', unsafe_allow_html=True)
+
+    with C():
+        st.markdown('<div class="sec-eye" style="margin-bottom:10px;">Explore</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-h">Browse Movies</div>', unsafe_allow_html=True)
+        f1, f2 = st.columns([3, 1])
+        with f1:
+            search = st.text_input("", placeholder="Search by title…",
+                                   label_visibility="collapsed", key="search_home")
+        with f2:
+            gpick  = st.selectbox("", ['All']+all_genres,
+                                  label_visibility="collapsed", key="gpick")
+        if search:
+            pool = movies_df[movies_df['title'].str.contains(search,case=False,na=False)]
+        elif gpick != 'All':
+            pool = movies_df[movies_df['genres'].str.contains(gpick,case=False,na=False)]
+        else:
+            pool = movies_df.sample(min(40,len(movies_df)),random_state=42)
+        filtered = pool.head(40)
+        st.markdown(f'<div class="count">{len(filtered)} TITLES</div>', unsafe_allow_html=True)
+
+    items = [(r['title'], r['genres'].split('|')[0].strip() if r['genres'] else '')
+             for _,r in filtered.iterrows()]
+    render_grid(items, 'home')
+
+    st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────
+# WATCHLIST
+# ─────────────────────────────────────────────────────────────────
+elif st.session_state.page == 'watchlist':
+
+    st.markdown('<div class="hero">', unsafe_allow_html=True)
+    with C():
+        st.markdown("""
+<div class="hero-body">
+  <div class="hero-eye">Your Collection</div>
+  <div class="hero-h">My <em>Watchlist</em></div>
+  <div class="hero-p">Films you've saved to watch later.</div>
+</div>""", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    wl = st.session_state.watchlist
+    if not wl:
+        st.markdown("""<div class="wl-empty">
+  <div class="wl-empty-icon">🎬</div>
+  <div class="wl-empty-h">Your watchlist is empty</div>
+  <p style="font-size:.83rem;">Open any movie and tap "Add to Watchlist".</p>
+</div>""", unsafe_allow_html=True)
+    else:
+        st.markdown('<div style="height:28px;"></div>', unsafe_allow_html=True)
+        with C():
+            st.markdown(f'<div class="count">{len(wl)} SAVED</div>', unsafe_allow_html=True)
+        wl_items = [(t,(movies_df[movies_df['title']==t]['genres'].values[0].split('|')[0].strip()
+                       if len(movies_df[movies_df['title']==t]) else '')) for t in wl]
+        render_grid(wl_items, 'watchlist')
+        st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
+        with C():
+            st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
+            if st.button("Clear Watchlist", key="clear_wl"):
+                st.session_state.watchlist=[]; st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────
+# FOR YOU
+# ─────────────────────────────────────────────────────────────────
+elif st.session_state.page == 'recs':
+
+    st.markdown('<div class="hero">', unsafe_allow_html=True)
+    with C():
+        st.markdown("""
+<div class="hero-body">
+  <div class="hero-eye">Personalised</div>
+  <div class="hero-h">Made <em>For You</em></div>
+  <div class="hero-p">Pick genres, or describe what you're in the mood for.</div>
+</div>""", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div style="height:36px;"></div>', unsafe_allow_html=True)
+    with C():
+
+        st.markdown('<div class="sec-eye" style="margin-bottom:20px;margin-top:0;">Recommendation Mode</div>', unsafe_allow_html=True)
+        mc1, mc2, _ = st.columns([1.4, 1.6, 9])
+        with mc1:
+            if st.button("🎭  By Genre", key="mode_genre"):
+                st.session_state.rec_mode='genre'; st.session_state.recs=None
+        with mc2:
+            st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
+            if st.button("🔍  By Search", key="mode_search"):
+                st.session_state.rec_mode='search'; st.session_state.recs=None
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        mode = st.session_state.rec_mode
+        st.markdown(f'<p style="font-size:.61rem;color:var(--gold);margin:12px 0 32px;letter-spacing:2px;font-weight:600;">{"GENRE-BASED" if mode=="genre" else "SEARCH-BASED"}</p>',
+                    unsafe_allow_html=True)
+
+        if mode == 'genre':
+            st.markdown('<div class="sec-eye" style="margin-bottom:14px;">Select genres you love</div>', unsafe_allow_html=True)
+            gcols  = st.columns(9)
+            picked = []
+            for idx, g in enumerate(all_genres):
+                with gcols[idx%9]:
+                    if st.checkbox(f"{GENRE_ICON.get(g,'🎬')} {g}", key=f"gc_{g}",
+                                   value=g in st.session_state.genres):
+                        picked.append(g)
+            st.session_state.genres = picked
+            if picked:
+                st.markdown(f'<p style="font-size:.64rem;color:var(--gold2);margin:16px 0 4px;letter-spacing:1px;font-weight:500;">SELECTED: {" · ".join(picked)}</p>',
+                            unsafe_allow_html=True)
+            st.markdown('<div style="height:24px;"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="sec-eye" style="margin-bottom:10px;">Number of results</div>', unsafe_allow_html=True)
+            top_n = st.slider("", 5, 20, 10, label_visibility="collapsed", key="topn")
+            st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
+            gb1, gb2, _ = st.columns([1.4, 1.7, 9])
+            with gb1:
+                find_btn = st.button("Find Movies", key="find_btn")
+            with gb2:
+                st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
+                if st.button("← Back to Browse", key="back_b"):
+                    st.session_state.page='home'; st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            if find_btn:
+                if not picked: st.warning("Please select at least one genre.")
+                else:
+                    with st.spinner("Finding movies…"):
+                        st.session_state.recs = genre_recs(picked, movies_df, top_n)
+        else:
+            st.markdown('<div class="sec-eye" style="margin-bottom:12px;">Describe what you want to watch</div>', unsafe_allow_html=True)
+            sq = st.text_input("", placeholder="e.g. 'space adventure with humour'",
+                               label_visibility="collapsed", key="sq_input",
+                               value=st.session_state.search_q)
+            st.session_state.search_q = sq
+            st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="sec-eye" style="margin-bottom:10px;">Number of results</div>', unsafe_allow_html=True)
+            top_n = st.slider("", 5, 20, 10, label_visibility="collapsed", key="topn_s")
+            st.markdown('<div style="height:20px;"></div>', unsafe_allow_html=True)
+            sb1, sb2, _ = st.columns([1.5, 1.7, 9])
+            with sb1:
+                srch_btn = st.button("Search Movies", key="srch_btn")
+            with sb2:
+                st.markdown('<div class="btn-ghost">', unsafe_allow_html=True)
+                if st.button("← Back to Browse", key="back_bs"):
+                    st.session_state.page='home'; st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            if srch_btn:
+                if not sq.strip(): st.warning("Please enter a description.")
+                else:
+                    with st.spinner("Searching…"):
+                        st.session_state.recs = search_recs(sq, movies_df, top_n)
+
+        if st.session_state.recs is not None:
+            recs = st.session_state.recs
+            if recs.empty:
+                st.warning("No results found. Try something different.")
+            else:
+                st.markdown('<div class="divider" style="margin:32px 0;"></div>', unsafe_allow_html=True)
+                st.markdown('<div class="sec-eye">Results</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="sec-h">Top {len(recs)} Picks For You</div>', unsafe_allow_html=True)
+
+                lc, rc = st.columns([1.2, 1])
+                with lc:
+                    for i, row in recs.iterrows():
+                        bw    = int(row['score']*100)
+                        pills = ''.join(f'<span class="rec-pill">{g.strip()}</span>'
+                                        for g in row['genres'].split('|') if g.strip())
+                        purl  = poster_url(row['title'])
+                        g0    = row['genres'].split('|')[0].strip()
+                        ph    = (f'<img class="rec-poster" src="{purl}" alt="" '
+                                 f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>'
+                                 f'<div class="rec-poster-ph" style="display:none;">{GENRE_ICON.get(g0,"🎬")}</div>'
+                                 if purl else f'<div class="rec-poster-ph">{GENRE_ICON.get(g0,"🎬")}</div>')
+                        num  = f"0{i+1}" if i+1<10 else str(i+1)
+                        href = card_href(row['title'],'recs')
+                        st.markdown(f"""
+<a class="rc" href="{href}">
+  <div class="rec-card">
+    <div class="rec-num">{num}</div>
+    {ph}
+    <div class="rec-body">
+      <div class="rec-title">{row['title']}</div>
+      <div class="rec-pills">{pills}</div>
+      <div class="rec-bar-bg"><div class="rec-bar" style="width:{bw}%;"></div></div>
+      <div class="rec-score">Match: {row['score']:.2f}</div>
+      <div class="rec-hint">Click to view full details →</div>
+    </div>
+  </div>
+</a>""", unsafe_allow_html=True)
+
+                with rc:
+                    st.markdown('<div class="chart-panel">', unsafe_allow_html=True)
+                    fig, ax = plt.subplots(figsize=(5.5, max(4, len(recs)*0.52)))
+                    fig.patch.set_facecolor('#0e0f18'); ax.set_facecolor('#0e0f18')
+                    tch = [r['title'][:26]+'…' if len(r['title'])>26 else r['title'] for _,r in recs.iterrows()]
+                    sc  = recs['score'].values
+                    pal = (['#c9a96e','#cdb07c','#d1b78a','#d5be98','#d9c5a6',
+                            '#ddcab0','#e1d0ba','#e5d5c4','#e9dace','#eddfd8']*2)[:len(sc)]
+                    ax.barh(tch[::-1], sc[::-1], color=pal[::-1], height=0.5, edgecolor='none')
+                    for b, s in zip(ax.patches, sc[::-1]):
+                        ax.text(b.get_width()+.014,b.get_y()+b.get_height()/2,
+                                f'{s:.2f}',va='center',color='#5a5a72',fontsize=7.5)
+                    ax.set_xlim(0,1.22)
+                    ax.set_xlabel('Match Score',color='#3a3a52',fontsize=8)
+                    ax.set_title('Match Chart',color='#c9a96e',fontsize=9,fontweight='bold',pad=10)
+                    ax.tick_params(colors='#3a3a52',labelsize=7)
+                    for sp in ax.spines.values(): sp.set_edgecolor('#1e1e2e')
+                    plt.tight_layout(pad=1.2)
+                    st.pyplot(fig); plt.close()
+                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('<div style="margin-top:12px;">', unsafe_allow_html=True)
+                    st.download_button("⬇ Download CSV", recs.to_csv(index=False),
+                                       "recommendations.csv","text/csv",key="dl_csv")
+                    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div style="height:48px;"></div>', unsafe_allow_html=True)
