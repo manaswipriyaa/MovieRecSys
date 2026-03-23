@@ -368,14 +368,24 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Insert the button using Streamlit's button component positioned in the nav
-col1, col2 = st.columns([19, 1])
-with col2:
-    st.markdown('<div style="margin-top:-50px;margin-right:48px;">', unsafe_allow_html=True)
-    if st.button("GET RECOMMENDATIONS", key="nav_cta_btn"):
-        st.session_state.page = 'recs'
-        st.session_state.movie = None
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown(f"""
+<div class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">CINEMATCH</div>
+    <div class="nav-sep"></div>
+    <nav class="nav-links">
+      <a class="{nc('home')}" href="{nav_href('home')}">Browse</a>
+      <a class="{nc('recs')}" href="{nav_href('recs')}">For You</a>
+      <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
+    </nav>
+    <div style="flex:1;"></div>
+
+    <a class="nav-cta" href="{nav_href('recs')}">
+      Get Recommendations
+    </a>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
