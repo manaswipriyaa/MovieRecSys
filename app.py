@@ -120,6 +120,20 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   transition:opacity .15s !important; transform:none !important;
 }
 .stButton > button:hover { opacity:.85 !important; transform:none !important; }
+/* Navigation button styling */
+.nav-btn-wrapper .stButton > button {
+  background:transparent !important; color:var(--muted) !important;
+  border:none !important; border-radius:5px !important;
+  font-family:'Outfit',sans-serif !important; font-size:.7rem !important;
+  font-weight:500 !important; letter-spacing:2px !important;
+  text-transform:uppercase !important; padding:8px 18px !important;
+  box-shadow:none !important; transition:color .15s, background .15s !important;
+}
+.nav-btn-wrapper .stButton > button:hover {
+  color:var(--gold) !important;
+  background:rgba(201,169,110,0.07) !important;
+  opacity:1 !important;
+}
 .btn-ghost .stButton > button {
   background:transparent !important; color:var(--muted) !important;
   border:1px solid rgba(255,255,255,.13) !important; box-shadow:none !important;
@@ -345,14 +359,43 @@ st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
     <div class="nav-logo">CINEMATCH</div>
-    <nav class="nav-links">
-      <a class="{nc('home')}"      href="{nav_href('home')}" onclick="event.preventDefault(); window.location.href='{nav_href('home')}'; return false;">Browse</a>
-      <a class="{nc('recs')}"      href="{nav_href('recs')}" onclick="event.preventDefault(); window.location.href='{nav_href('recs')}'; return false;">For You</a>
-      <a class="{nc('watchlist')}" href="{nav_href('watchlist')}" onclick="event.preventDefault(); window.location.href='{nav_href('watchlist')}'; return false;">Watchlist{badge}</a>
-    </nav>
+    <div style="flex:1;"></div>
+    <div id="nav-buttons-placeholder" style="display:flex;gap:32px;align-items:center;"></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Add navigation buttons inline with the nav bar
+st.markdown('<style>.nav-buttons-container {position:absolute;top:11px;right:48px;z-index:10001;display:flex;gap:32px;}</style>', unsafe_allow_html=True)
+st.markdown('<div class="nav-buttons-container">', unsafe_allow_html=True)
+
+bcol1, bcol2, bcol3 = st.columns(3)
+with bcol1:
+    st.markdown(f'<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+    if st.button("BROWSE", key="nav_browse"):
+        st.session_state.page = 'home'
+        st.session_state.movie = None
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with bcol2:
+    st.markdown(f'<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+    if st.button("FOR YOU", key="nav_foryou"):
+        st.session_state.page = 'recs'
+        st.session_state.movie = None
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with bcol3:
+    st.markdown(f'<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+    wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
+    if st.button(wl_label, key="nav_watchlist"):
+        st.session_state.page = 'watchlist'
+        st.session_state.movie = None
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
