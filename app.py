@@ -26,8 +26,8 @@ if "tmdb_cache" not in st.session_state:
     st.session_state.tmdb_cache = {}
 
 for k, v in {"page":"home","movie":None,"watchlist":[],"recs":None,"search_q":""}.items():
-if k not in st.session_state:
-st.session_state[k] = v
+    if k not in st.session_state:
+        st.session_state[k] = v
 
 # ------------------------------
 
@@ -46,10 +46,10 @@ IMG_BASE = "https://image.tmdb.org/t/p"
 
 @st.cache_data
 def load_data():
-rd = pd.read_csv("data/ratings.csv")
-md = pd.read_csv("data/movies.csv")
-md['genres'] = md['genres'].fillna('')
-return rd, md
+    rd = pd.read_csv("data/ratings.csv")
+    md = pd.read_csv("data/movies.csv")
+    md['genres'] = md['genres'].fillna('')
+    return rd, md
 
 ratings_df, movies_df = load_data()
 
@@ -67,8 +67,8 @@ title_to_movie_id = dict(zip(movies_df['title'], movies_df['movieId']))
 
 @st.cache_data
 def tmdb_search(title):
-if title in st.session_state.tmdb_cache:
-return st.session_state.tmdb_cache[title]
+    if title in st.session_state.tmdb_cache:
+        return st.session_state.tmdb_cache[title]
 
 ```
 try:
@@ -86,10 +86,10 @@ except:
 ```
 
 def poster_url(title):
-r = tmdb_search(title)
-if r and r.get("poster_path"):
-return f"{IMG_BASE}/w300{r['poster_path']}"
-return None
+    r = tmdb_search(title)
+    if r and r.get("poster_path"):
+        return f"{IMG_BASE}/w300{r['poster_path']}"
+    return None
 
 # ------------------------------
 
@@ -99,9 +99,9 @@ return None
 
 @st.cache_data
 def build_tfidf(mdf):
-tfidf = TfidfVectorizer(token_pattern=r'[^|]+')
-mat = tfidf.fit_transform(mdf['genres'])
-return tfidf, mat
+    tfidf = TfidfVectorizer(token_pattern=r'[^|]+')
+    mat = tfidf.fit_transform(mdf['genres'])
+    return tfidf, mat
 
 # ------------------------------
 
@@ -111,14 +111,14 @@ return tfidf, mat
 
 @st.cache_data
 def build_collab_model(ratings_df):
-user_movie = ratings_df.pivot_table(index='userId', columns='movieId', values='rating').fillna(0)
-U, sigma, Vt = np.linalg.svd(user_movie, full_matrices=False)
-sigma = np.diag(sigma)
-return user_movie, np.dot(np.dot(U, sigma), Vt)
+    user_movie = ratings_df.pivot_table(index='userId', columns='movieId', values='rating').fillna(0)
+    U, sigma, Vt = np.linalg.svd(user_movie, full_matrices=False)
+    sigma = np.diag(sigma)
+    return user_movie, np.dot(np.dot(U, sigma), Vt)
 
 def collab_recs(watchlist, user_movie, reconstructed, n=20):
-if not watchlist:
-return pd.DataFrame()
+    if not watchlist:
+        return pd.DataFrame()
 
 ```
 user_vec = np.zeros(user_movie.shape[1])
@@ -153,14 +153,11 @@ return pd.DataFrame(res[:n])
 # ------------------------------
 
 def hybrid_recs(picked, watchlist, mdf, n=10):
-
-```
-tfidf, mat = build_tfidf(mdf)
-
-cos = cosine_similarity(
+    ```
+    tfidf, mat = build_tfidf(mdf)
+    cos = cosine_similarity(
     tfidf.transform(['|'.join(picked)]),
-    mat
-).flatten()
+    mat).flatten()
 
 def cov(g):
     return len(set(picked) & set(g.split('|'))) / len(picked)
@@ -202,12 +199,12 @@ MOOD_MAP = {
 }
 
 def mood_to_genres(text):
-text = text.lower()
-g = set()
+    text = text.lower()
+    g = set()
 for w, lst in MOOD_MAP.items():
-if w in text:
-g.update(lst)
-return list(g)
+    if w in text:
+        g.update(lst)
+    return list(g)
 
 # ------------------------------
 
@@ -216,8 +213,8 @@ return list(g)
 # ------------------------------
 
 def because_you_watched(watchlist, mdf, n=8):
-if not watchlist:
-return []
+    if not watchlist:
+        return []
 
 ```
 seed = watchlist[-1]
@@ -232,15 +229,15 @@ return [(r['title'], r['genres'].split('|')[0]) for _, r in recs.iterrows()]
 ```
 
 def trending_now(ratings_df, mdf, n=10):
-pop = ratings_df.groupby('movieId').size().sort_values(ascending=False).head(n)
-out = []
-for mid in pop.index:
-row = mdf[mdf['movieId']==mid]
-if not row.empty:
-t = row['title'].values[0]
-g = row['genres'].values[0].split('|')[0]
-out.append((t,g))
-return out
+    pop = ratings_df.groupby('movieId').size().sort_values(ascending=False).head(n)
+    out = []
+    for mid in pop.index:
+        row = mdf[mdf['movieId']==mid]
+        if not row.empty:
+            t = row['title'].values[0]
+            g = row['genres'].values[0].split('|')[0]
+            out.append((t,g))
+    return out
 
 # ------------------------------
 
@@ -249,9 +246,9 @@ return out
 # ------------------------------
 
 def chatbot_recommend(text, mdf, watchlist, n=8):
-g = mood_to_genres(text)
-if g:
-return hybrid_recs(g, watchlist, mdf.copy(), n)
+    g = mood_to_genres(text)
+    if g:
+        return hybrid_recs(g, watchlist, mdf.copy(), n)
 return hybrid_recs(["Drama"], watchlist, mdf.copy(), n)
 
 # ------------------------------
@@ -268,8 +265,8 @@ st.subheader("Ask CineMatch")
 q = st.text_input("Try: funny action or sad love story")
 
 if q:
-recs = chatbot_recommend(q, movies_df, st.session_state.watchlist)
-st.dataframe(recs)
+    recs = chatbot_recommend(q, movies_df, st.session_state.watchlist)
+    st.dataframe(recs)
 
 # GENRE PICK
 
@@ -277,9 +274,9 @@ genres = sorted({g for gs in movies_df['genres'] for g in gs.split('|')})
 picked = st.multiselect("Pick Genres", genres)
 
 if st.button("Recommend"):
-if picked:
-recs = hybrid_recs(picked, st.session_state.watchlist, movies_df.copy())
-st.dataframe(recs)
+    if picked:
+        recs = hybrid_recs(picked, st.session_state.watchlist, movies_df.copy())
+    st.dataframe(recs)
 
 # NETFLIX SECTIONS
 
@@ -288,6 +285,6 @@ trend = trending_now(ratings_df, movies_df)
 st.write(trend)
 
 if st.session_state.watchlist:
-st.subheader("Because You Watched")
-byw = because_you_watched(st.session_state.watchlist, movies_df)
-st.write(byw)
+    st.subheader("Because You Watched")
+    byw = because_you_watched(st.session_state.watchlist, movies_df)
+    st.write(byw)
