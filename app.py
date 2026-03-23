@@ -66,7 +66,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   font-family:'Playfair Display',serif; font-weight:900;
   font-size:1.05rem; letter-spacing:5px; text-transform:uppercase;
   color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
-  text-decoration:none;
+  text-decoration:none; cursor:pointer;
 }
 .nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
 .nav-links { display:flex; align-items:center; gap:2px; }
@@ -345,7 +345,7 @@ def nc(pid): return "nav-link active" if p==pid else "nav-link"
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
+    <a class="nav-logo" href="{nav_href('logo')}">CineMatch</a>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
