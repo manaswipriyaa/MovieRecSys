@@ -31,7 +31,7 @@ for k, v in {"page":"home","prev":"home","movie":None,"genres":[],
 # ─────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&family=Cinzel:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --bg:#08090e; --surf:#0e0f18; --surf2:#141520;
@@ -63,10 +63,9 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   display:flex; align-items:center; gap:0;
 }
 .nav-logo {
-  font-family:'Playfair Display',serif; font-weight:900;
-  font-size:1.05rem; letter-spacing:5px; text-transform:uppercase;
+  font-family:'Cinzel',serif; font-weight:700;
+  font-size:1.15rem; letter-spacing:4px; text-transform:uppercase;
   color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
-  text-decoration:none;
 }
 .nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
 .nav-links { display:flex; align-items:center; gap:2px; }
@@ -76,8 +75,8 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   white-space:nowrap; transition:color .15s, background .15s;
 }
 .nav-link:hover { color:var(--gold); background:rgba(201,169,110,0.07); }
-.nav a, .nav-logo, .nav-link, .nav-cta { text-decoration:none !important; }
-.nav a:hover, .nav-logo:hover, .nav-link:hover, .nav-cta:hover { text-decoration:none !important; }
+.nav a, .nav-link, .nav-cta { text-decoration:none !important; }
+.nav a:hover, .nav-link:hover, .nav-cta:hover { text-decoration:none !important; }
 .nav-link.active { color:var(--gold2); }
 .nav-badge {
   display:inline-block; background:var(--gold); color:#08090e;
@@ -345,15 +344,13 @@ def nc(pid): return "nav-link active" if p==pid else "nav-link"
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('home')}">CineMatch</a>
+    <div class="nav-logo">CINEMATCH</div>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
       <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
       <a class="{nc('watchlist')}" href="{nav_href('watchlist')}">Watchlist{badge}</a>
     </nav>
-    <div style="flex:1;"></div>
-    <a class="nav-cta" href="{nav_href('recs')}">Get Recommendations</a>
   </div>
 </div>
 """, unsafe_allow_html=True)
