@@ -60,7 +60,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
 }
 .nav-inner {
   padding:0 48px; height:62px;
-  display:flex; align-items:center; gap:0;
+  display:flex; align-items:center; justify-content:space-between;
 }
 .nav-logo {
   font-family:'Cinzel',serif; font-weight:700;
@@ -68,7 +68,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
 }
 .nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
-.nav-links { display:flex; align-items:center; gap:2px; }
+.nav-links { display:flex; align-items:center; gap:32px; }
 .nav-link {
   font-size:0.7rem; font-weight:500; letter-spacing:2px; text-transform:uppercase;
   color:var(--muted); text-decoration:none; padding:8px 18px; border-radius:5px;
@@ -345,7 +345,6 @@ st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
     <div class="nav-logo">CINEMATCH</div>
-    <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
       <a class="{nc('recs')}"      href="{nav_href('recs')}">For You</a>
