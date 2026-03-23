@@ -66,10 +66,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   font-family:'Cinzel',serif; font-weight:700;
   font-size:1.15rem; letter-spacing:4px; text-transform:uppercase;
   color:var(--gold); white-space:nowrap; flex-shrink:0; margin-right:40px;
-  text-decoration:none; cursor:pointer;
-  transition:color .15s, opacity .15s;
 }
-.nav-logo:hover { color:var(--gold2); opacity:0.9; }
 .nav-sep { width:1px; height:18px; background:var(--bdr); flex-shrink:0; margin-right:6px; }
 .nav-links { display:flex; align-items:center; gap:2px; }
 .nav-link {
@@ -78,8 +75,8 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   white-space:nowrap; transition:color .15s, background .15s;
 }
 .nav-link:hover { color:var(--gold); background:rgba(201,169,110,0.07); }
-.nav a, .nav-logo, .nav-link, .nav-cta { text-decoration:none !important; }
-.nav a:hover, .nav-logo:hover, .nav-link:hover, .nav-cta:hover { text-decoration:none !important; }
+.nav a, .nav-link, .nav-cta { text-decoration:none !important; }
+.nav a:hover, .nav-link:hover, .nav-cta:hover { text-decoration:none !important; }
 .nav-link.active { color:var(--gold2); }
 .nav-badge {
   display:inline-block; background:var(--gold); color:#08090e;
@@ -344,25 +341,10 @@ wlc = len(st.session_state.watchlist)
 badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
 def nc(pid): return "nav-link active" if p==pid else "nav-link"
 
-# JavaScript to handle logo click that resets state and redirects
-st.markdown("""
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const logoLink = document.querySelector('.nav-logo');
-    if (logoLink) {
-        logoLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = '?nav=logo';
-        });
-    }
-});
-</script>
-""", unsafe_allow_html=True)
-
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="{nav_href('logo')}">CINEMATCH</a>
+    <div class="nav-logo">CINEMATCH</div>
     <div class="nav-sep"></div>
     <nav class="nav-links">
       <a class="{nc('home')}"      href="{nav_href('home')}">Browse</a>
