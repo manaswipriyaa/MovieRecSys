@@ -359,14 +359,12 @@ st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
     <div class="nav-logo">CINEMATCH</div>
-    <div class="nav-links-container">
-    </div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Add navigation buttons using Streamlit
-st.markdown('<div style="position:absolute;top:0;right:48px;z-index:10000;display:flex;gap:32px;align-items:center;height:62px;">', unsafe_allow_html=True)
+# Add navigation buttons using Streamlit positioned at top right
+st.markdown('<div style="position:absolute;top:11px;right:48px;z-index:10000;display:flex;gap:32px;align-items:center;">', unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3)
 with col1:
