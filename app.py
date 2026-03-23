@@ -370,7 +370,7 @@ st.markdown(f"""
 # Insert the button using Streamlit's button component positioned in the nav
 col1, col2 = st.columns([19, 1])
 with col2:
-    st.markdown('<div style="margin-top:-62px;margin-right:48px;">', unsafe_allow_html=True)
+    st.markdown('<div style="margin-top:-50px;margin-right:48px;">', unsafe_allow_html=True)
     if st.button("GET RECOMMENDATIONS", key="nav_cta_btn"):
         st.session_state.page = 'recs'
         st.session_state.movie = None
