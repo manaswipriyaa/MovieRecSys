@@ -121,7 +121,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
 }
 .stButton > button:hover { opacity:.85 !important; transform:none !important; }
 /* Navigation button styling */
-.nav-button-row .stButton > button {
+.top-nav-buttons .stButton > button {
   background:transparent !important; color:var(--muted) !important;
   border:none !important; border-radius:5px !important;
   font-family:'Outfit',sans-serif !important; font-size:.7rem !important;
@@ -129,7 +129,7 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   text-transform:uppercase !important; padding:8px 18px !important;
   box-shadow:none !important; transition:color .15s, background .15s !important;
 }
-.nav-button-row .stButton > button:hover {
+.top-nav-buttons .stButton > button:hover {
   color:var(--gold) !important;
   background:rgba(201,169,110,0.07) !important;
   opacity:1 !important;
@@ -355,7 +355,7 @@ wlc = len(st.session_state.watchlist)
 badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
 def nc(pid): return "nav-link active" if p==pid else "nav-link"
 
-# Navigation bar with buttons properly aligned
+# Navigation bar
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
@@ -365,53 +365,51 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Position buttons at the top right using columns with proper layout
+# Add buttons in the top right using absolute positioning with inline display
 st.markdown("""
 <style>
-.nav-button-row {{
+.top-nav-buttons {
     position: fixed;
-    top: 11px;
+    top: 19px;
     right: 48px;
     z-index: 10002;
-}}
-.nav-button-row > div[data-testid="column"] {{
-    display: inline-block !important;
+    display: flex;
+    gap: 32px;
+}
+.top-nav-buttons [data-testid="column"] {
+    flex: 0 0 auto !important;
     width: auto !important;
-    padding: 0 16px !important;
-    vertical-align: middle !important;
-}}
-.nav-button-row .element-container {{
-    display: inline-block !important;
-}}
+    min-width: auto !important;
+}
+.top-nav-buttons .stButton {
+    display: inline-block;
+}
 </style>
 """, unsafe_allow_html=True)
 
-cols_container = st.container()
-with cols_container:
-    st.markdown('<div class="nav-button-row">', unsafe_allow_html=True)
-    
-    c1, c2, c3 = st.columns([1, 1, 1.2])
-    
-    with c1:
-        if st.button("BROWSE", key="nav_browse", use_container_width=False):
-            st.session_state.page = 'home'
-            st.session_state.movie = None
-            st.rerun()
-    
-    with c2:
-        if st.button("FOR YOU", key="nav_foryou", use_container_width=False):
-            st.session_state.page = 'recs'
-            st.session_state.movie = None
-            st.rerun()
-    
-    with c3:
-        wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
-        if st.button(wl_label, key="nav_watchlist", use_container_width=False):
-            st.session_state.page = 'watchlist'
-            st.session_state.movie = None
-            st.rerun()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<div class="top-nav-buttons">', unsafe_allow_html=True)
+b1, b2, b3 = st.columns([1, 1, 1.3])
+
+with b1:
+    if st.button("BROWSE", key="nav_browse"):
+        st.session_state.page = 'home'
+        st.session_state.movie = None
+        st.rerun()
+
+with b2:
+    if st.button("FOR YOU", key="nav_foryou"):
+        st.session_state.page = 'recs'
+        st.session_state.movie = None
+        st.rerun()
+
+with b3:
+    wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
+    if st.button(wl_label, key="nav_watchlist"):
+        st.session_state.page = 'watchlist'
+        st.session_state.movie = None
+        st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
