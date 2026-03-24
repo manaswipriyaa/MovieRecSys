@@ -120,20 +120,6 @@ div[data-testid="stSidebar"], footer, header { display:none !important; }
   transition:opacity .15s !important; transform:none !important;
 }
 .stButton > button:hover { opacity:.85 !important; transform:none !important; }
-/* Navigation button styling */
-.top-nav-buttons .stButton > button {
-  background:transparent !important; color:var(--muted) !important;
-  border:none !important; border-radius:5px !important;
-  font-family:'Outfit',sans-serif !important; font-size:.7rem !important;
-  font-weight:500 !important; letter-spacing:2px !important;
-  text-transform:uppercase !important; padding:8px 18px !important;
-  box-shadow:none !important; transition:color .15s, background .15s !important;
-}
-.top-nav-buttons .stButton > button:hover {
-  color:var(--gold) !important;
-  background:rgba(201,169,110,0.07) !important;
-  opacity:1 !important;
-}
 .btn-ghost .stButton > button {
   background:transparent !important; color:var(--muted) !important;
   border:1px solid rgba(255,255,255,.13) !important; box-shadow:none !important;
@@ -355,56 +341,68 @@ wlc = len(st.session_state.watchlist)
 badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
 def nc(pid): return "nav-link active" if p==pid else "nav-link"
 
-# Navigation bar
 st.markdown(f"""
 <div class="nav">
   <div class="nav-inner">
     <div class="nav-logo">CINEMATCH</div>
-    <div style="flex:1;"></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Add buttons in the top right using absolute positioning with inline display
+# Add navigation buttons with absolute positioning to keep them in place
 st.markdown("""
 <style>
-.top-nav-buttons {
+.fixed-nav-buttons {
     position: fixed;
-    top: 19px;
+    top: 11px;
     right: 48px;
-    z-index: 10002;
+    z-index: 10001;
     display: flex;
     gap: 32px;
 }
-.top-nav-buttons [data-testid="column"] {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: auto !important;
-}
-.top-nav-buttons .stButton {
+.fixed-nav-buttons .element-container {
     display: inline-block;
+}
+.fixed-nav-buttons .stButton > button {
+    background: transparent !important;
+    color: var(--muted) !important;
+    border: none !important;
+    border-radius: 5px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    padding: 8px 18px !important;
+    box-shadow: none !important;
+    transition: color 0.15s, background 0.15s !important;
+}
+.fixed-nav-buttons .stButton > button:hover {
+    color: var(--gold) !important;
+    background: rgba(201, 169, 110, 0.07) !important;
+    opacity: 1 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="top-nav-buttons">', unsafe_allow_html=True)
-b1, b2, b3 = st.columns([1, 1, 1.3])
+st.markdown('<div class="fixed-nav-buttons">', unsafe_allow_html=True)
+nav_col1, nav_col2, nav_col3 = st.columns(3)
 
-with b1:
-    if st.button("BROWSE", key="nav_browse"):
+with nav_col1:
+    if st.button("BROWSE", key="nav_btn_browse"):
         st.session_state.page = 'home'
         st.session_state.movie = None
         st.rerun()
 
-with b2:
-    if st.button("FOR YOU", key="nav_foryou"):
+with nav_col2:
+    if st.button("FOR YOU", key="nav_btn_foryou"):
         st.session_state.page = 'recs'
         st.session_state.movie = None
         st.rerun()
 
-with b3:
-    wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
-    if st.button(wl_label, key="nav_watchlist"):
+with nav_col3:
+    wl_text = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
+    if st.button(wl_text, key="nav_btn_watchlist"):
         st.session_state.page = 'watchlist'
         st.session_state.movie = None
         st.rerun()
