@@ -355,64 +355,71 @@ wlc = len(st.session_state.watchlist)
 badge = f'<span class="nav-badge">{wlc}</span>' if wlc else ''
 def nc(pid): return "nav-link active" if p==pid else "nav-link"
 
-st.markdown(f"""
-<div class="nav">
-  <div class="nav-inner">
-    <div class="nav-logo">CINEMATCH</div>
-    <div style="flex:1;"></div>
-  </div>
-</div>
+# Create wrapper for the entire navigation including buttons
+st.markdown("""
+<style>
+.main-nav-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: rgba(8,9,14,0.97);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--bdr);
+    height: 62px;
+    display: flex;
+    align-items: center;
+    padding: 0 48px;
+    justify-content: space-between;
+}
+.nav-buttons-inline {
+    display: flex !important;
+    gap: 32px !important;
+    align-items: center !important;
+}
+.nav-buttons-inline [data-testid="column"] {
+    width: auto !important;
+    flex: none !important;
+}
+.nav-buttons-inline .stButton {
+    margin: 0 !important;
+}
+</style>
 """, unsafe_allow_html=True)
 
-# Navigation buttons positioned at top right
-nav_container = st.container()
-with nav_container:
-    st.markdown("""
-    <style>
-    .nav-buttons-row {
-        position: fixed;
-        top: 11px;
-        right: 48px;
-        z-index: 10001;
-        display: flex;
-        gap: 0px;
-    }
-    .nav-buttons-row > div {
-        display: flex !important;
-        gap: 0px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<div class="nav-buttons-row">', unsafe_allow_html=True)
-    bcol1, bcol2, bcol3 = st.columns([1, 1, 1], gap="large")
-    
-    with bcol1:
-        st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
-        if st.button("BROWSE", key="nav_browse"):
-            st.session_state.page = 'home'
-            st.session_state.movie = None
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with bcol2:
-        st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
-        if st.button("FOR YOU", key="nav_foryou"):
-            st.session_state.page = 'recs'
-            st.session_state.movie = None
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with bcol3:
-        st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
-        wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
-        if st.button(wl_label, key="nav_watchlist"):
-            st.session_state.page = 'watchlist'
-            st.session_state.movie = None
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    
+st.markdown('<div class="main-nav-wrapper">', unsafe_allow_html=True)
+st.markdown('<div class="nav-logo">CINEMATCH</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="nav-buttons-inline">', unsafe_allow_html=True)
+btn_col1, btn_col2, btn_col3 = st.columns(3)
+
+with btn_col1:
+    st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+    if st.button("BROWSE", key="nav_browse"):
+        st.session_state.page = 'home'
+        st.session_state.movie = None
+        st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
+
+with btn_col2:
+    st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+    if st.button("FOR YOU", key="nav_foryou"):
+        st.session_state.page = 'recs'
+        st.session_state.movie = None
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with btn_col3:
+    st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+    wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
+    if st.button(wl_label, key="nav_watchlist"):
+        st.session_state.page = 'watchlist'
+        st.session_state.movie = None
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)  # Close nav-buttons-inline
+st.markdown('</div>', unsafe_allow_html=True)  # Close main-nav-wrapper
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
