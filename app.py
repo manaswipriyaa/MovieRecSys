@@ -360,42 +360,59 @@ st.markdown(f"""
   <div class="nav-inner">
     <div class="nav-logo">CINEMATCH</div>
     <div style="flex:1;"></div>
-    <div id="nav-buttons-placeholder" style="display:flex;gap:32px;align-items:center;"></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Add navigation buttons inline with the nav bar
-st.markdown('<style>.nav-buttons-container {position:absolute;top:11px;right:48px;z-index:10001;display:flex;gap:32px;}</style>', unsafe_allow_html=True)
-st.markdown('<div class="nav-buttons-container">', unsafe_allow_html=True)
-
-bcol1, bcol2, bcol3 = st.columns(3)
-with bcol1:
-    st.markdown(f'<div class="nav-btn-wrapper">', unsafe_allow_html=True)
-    if st.button("BROWSE", key="nav_browse"):
-        st.session_state.page = 'home'
-        st.session_state.movie = None
-        st.rerun()
+# Navigation buttons positioned at top right
+nav_container = st.container()
+with nav_container:
+    st.markdown("""
+    <style>
+    .nav-buttons-row {
+        position: fixed;
+        top: 11px;
+        right: 48px;
+        z-index: 10001;
+        display: flex;
+        gap: 0px;
+    }
+    .nav-buttons-row > div {
+        display: flex !important;
+        gap: 0px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="nav-buttons-row">', unsafe_allow_html=True)
+    bcol1, bcol2, bcol3 = st.columns([1, 1, 1], gap="large")
+    
+    with bcol1:
+        st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+        if st.button("BROWSE", key="nav_browse"):
+            st.session_state.page = 'home'
+            st.session_state.movie = None
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with bcol2:
+        st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+        if st.button("FOR YOU", key="nav_foryou"):
+            st.session_state.page = 'recs'
+            st.session_state.movie = None
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with bcol3:
+        st.markdown('<div class="nav-btn-wrapper">', unsafe_allow_html=True)
+        wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
+        if st.button(wl_label, key="nav_watchlist"):
+            st.session_state.page = 'watchlist'
+            st.session_state.movie = None
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     st.markdown('</div>', unsafe_allow_html=True)
-
-with bcol2:
-    st.markdown(f'<div class="nav-btn-wrapper">', unsafe_allow_html=True)
-    if st.button("FOR YOU", key="nav_foryou"):
-        st.session_state.page = 'recs'
-        st.session_state.movie = None
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with bcol3:
-    st.markdown(f'<div class="nav-btn-wrapper">', unsafe_allow_html=True)
-    wl_label = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
-    if st.button(wl_label, key="nav_watchlist"):
-        st.session_state.page = 'watchlist'
-        st.session_state.movie = None
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 if ratings_df is None:
     st.error("Data files not found. Add data/ratings.csv and data/movies.csv."); st.stop()
