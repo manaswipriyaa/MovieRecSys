@@ -238,6 +238,42 @@ a.rc:hover .rec-card { border-color:rgba(201,169,110,.28); transform:translateX(
 div[data-baseweb="select"] > div { background:var(--surf) !important; border:1px solid rgba(255,255,255,.09) !important; border-radius:7px !important; }
 .stCheckbox label { background:var(--surf) !important; border:1px solid var(--bdr) !important; border-radius:5px !important; padding:5px 12px !important; font-size:.69rem !important; font-weight:500 !important; color:var(--muted) !important; cursor:pointer !important; white-space:nowrap !important; }
 .stCheckbox label:hover { border-color:rgba(201,169,110,.35) !important; color:var(--gold2) !important; }
+
+/* NAV BUTTONS */
+.nav-button-container {
+    position: fixed;
+    top: 0;
+    right: 48px;
+    height: 62px;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    pointer-events: none;
+}
+.nav-button-container .element-container {
+    pointer-events: all;
+}
+.nav-buttons .stButton > button {
+    background: transparent !important;
+    color: var(--muted) !important;
+    border: none !important;
+    border-radius: 5px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    padding: 8px 18px !important;
+    box-shadow: none !important;
+    transition: color 0.15s, background 0.15s !important;
+    white-space: nowrap !important;
+}
+.nav-buttons .stButton > button:hover {
+    color: var(--gold) !important;
+    background: rgba(201, 169, 110, 0.07) !important;
+    opacity: 1 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -349,58 +385,23 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Add navigation buttons with absolute positioning to keep them in place
-st.markdown("""
-<style>
-.fixed-nav-buttons {
-    position: fixed;
-    top: 11px;
-    right: 48px;
-    z-index: 10001;
-    display: flex;
-    gap: 32px;
-}
-.fixed-nav-buttons .element-container {
-    display: inline-block;
-}
-.fixed-nav-buttons .stButton > button {
-    background: transparent !important;
-    color: var(--muted) !important;
-    border: none !important;
-    border-radius: 5px !important;
-    font-family: 'Outfit', sans-serif !important;
-    font-size: 0.7rem !important;
-    font-weight: 500 !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
-    padding: 8px 18px !important;
-    box-shadow: none !important;
-    transition: color 0.15s, background 0.15s !important;
-}
-.fixed-nav-buttons .stButton > button:hover {
-    color: var(--gold) !important;
-    background: rgba(201, 169, 110, 0.07) !important;
-    opacity: 1 !important;
-}
-</style>
-""", unsafe_allow_html=True)
+# Navigation buttons in fixed position opposite to CINEMATCH logo
+st.markdown('<div class="nav-button-container nav-buttons">', unsafe_allow_html=True)
+btn_col1, btn_col2, btn_col3 = st.columns(3)
 
-st.markdown('<div class="fixed-nav-buttons">', unsafe_allow_html=True)
-nav_col1, nav_col2, nav_col3 = st.columns(3)
-
-with nav_col1:
+with btn_col1:
     if st.button("BROWSE", key="nav_btn_browse"):
         st.session_state.page = 'home'
         st.session_state.movie = None
         st.rerun()
 
-with nav_col2:
+with btn_col2:
     if st.button("FOR YOU", key="nav_btn_foryou"):
         st.session_state.page = 'recs'
         st.session_state.movie = None
         st.rerun()
 
-with nav_col3:
+with btn_col3:
     wl_text = f"WATCHLIST ({wlc})" if wlc else "WATCHLIST"
     if st.button(wl_text, key="nav_btn_watchlist"):
         st.session_state.page = 'watchlist'
